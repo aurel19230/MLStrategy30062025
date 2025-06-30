@@ -1,0 +1,5 @@
+Erreurs détectées lors de l'analyse du fichier C:\Users\aulac\OneDrive\Documents\Trading\PyCharmProject\MLStrategy\data_preprocessing\discord_derivative\raw_level_01052025.txt:
+
+- Date 01/05/2025, Ticker VIX: Éléments manquants: Min_1D_event
+- Date 01/05/2025, Ticker VXN: Éléments manquants: Min_1D_event
+- Date 01/05/2025, Ticker RVX: Éléments manquants: Min_1D_event

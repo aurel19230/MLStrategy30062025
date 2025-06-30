@@ -1,0 +1,63 @@
+ESm25 (vix à surveiller)  gamma négatif 
+Max 1D 5580 (en cas d'event 5594, extreme 5609)
+Min 1D 5458 (en cas d'event 5442, extreme 5427) 
+Prise de contrôle acheteurs 5526
+Prise de contrôle vendeurs 5493
+Put sup. 0dte 5500 (all 5450, 5400, 5350, 5150, 5100 5000, 4900)
+Call res. 0dte 5510 (all 5550 5600 5625, 5650, 5675)
+
+NQm25 (Sdex & VXN à surveiller) Gamma positif
+Max 1D 19706 (en cas d'event 19777, extreme 19848)
+Min 1D 19140 (en cas d'event 19066, extreme 18998)
+Prise de contrôle acheteurs 19466
+Prise de contrôle vendeurs 19306
+Call res. 0dte 19600 (all  19700, 19800, 19900, 20000)
+Put sup 0dte 19500, 19000, 18700 18600 18400 18200 (all 18000, 17650)
+
+RTY m25 (rvx à surveiller + IWM) Gamma négatif 
+Max 1D 1973 (en cas event 1979)
+Min 1D 1921 (en cas d'event 1914)
+Acheteurs prise de contrôle 1958
+Vendeurs prise de contrôle 1944
+Put sup. 0dte 1930, 1850 (put all 1830, 1825, 1820, 1775, 1750, 1700)
+Call res. 0dte  1950  1975, 2000
+
+YMm25 gamma négatif 
+Max 1D  40449 (en cas d event 40533)
+Min 1D 39747 (en cas d event 39658)
+Prise de contrôle acheteurs 40252
+Prise de contrôle vendeurs 40055
+Put sup 0dte 39500, 39000 (all  38000 37000, 36500)
+Call res 0dte 39600 (all 39800, 40000, 40500, 41000, 41200)
+
+GCm25 (surveillez GVZ) gamma positif
+Max 1D  3364 (en cas d'event 3379)
+Min 1D  3245 (en cas d'event 3229)
+Acheteurs prise de contrôle 3326
+Vendeurs prise de contrôle 3296
+Put sup. 3400, 3350, 3200, 3300, 3275, 3250 
+Call res.   3300 3250 3275 3300 (all 3350 3400 3450 3475 3500 3600 3700)
+
+CLm25  Géopo  & OVX à Surveiller gamma négatif
+Max 1D 64.80 (event 65.18)
+Min 1D 61.81 (event 61.45)
+Acheteurs prise de contrôle 63.27
+Vendeurs prise de contrôle 62.43
+Put sup.  61.00 60.50 60.00 59.50 58.50 ( hedgies 69.50 69.00 68.00)
+Call res.   62.50 63.00 63.50 64.00 64.50 65.00 65.50
+
+NG k25 (US nat Gaz US front month futures HH) Gamma négatif surveiller NGVL
+Max 1D 3.52 (max event 3.61)
+Min 1D 2.79 (min event 2.70)
+Prise de contrôle acheteurs 3.19
+Prise de contrôle vendeurs 2.99
+Put sup 3.00 (all 2.80)
+Call res 3.10 ( All 3.50)
+
+6j
+Max 1D 0.007038 (event 0.007046)
+Min 1D 0.006980 (event 0.006972)
+Prise de contrôle acheteurs 0.007014
+Prise de contrôle vendeurs 0.006997
+Put sup 0.007075 0.007050 0.006900
+Call res  0.007175, 0.007200, 0.007250, 0.007300

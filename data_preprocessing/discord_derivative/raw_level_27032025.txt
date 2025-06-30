@@ -1,0 +1,66 @@
+derivatives — 27/03/2025 09:56
+ESm25 (vix à surveiller)  gamma négatif 
+Max 1D 5884 (en cas d'event 5914)
+Min 1D 5650 (en cas d'event 5621) 
+Prise de contrôle acheteurs 5784
+Prise de contrôle vendeurs 5718
+Put sup. 0dte 5760 (all 5750, 5700,  5650, 5625)
+Call res. 0dte 5800 (all 5850, 5875, 5900, 5920)
+
+NQm25 (Sdex & VXN à surveiller) Gamma négatif
+Max 1D 20763 (en cas d'event 20921)
+Min 1D 19491 (en cas d'event 19333)
+Prise de contrôle acheteurs 20232
+Prise de contrôle vendeurs 19882
+Call res. 0dte 20500 (all 20550, 20600, 20700, 20800, 20850, 21000)
+Put sup 0dte 20100 (all 20050, 20000, 19900, 19850, 19800, 19700)
+
+RTY m25 (rvx à surveiller + IWM) Gamma négatif
+Max 1D 2098 (en cas event 2136)
+Min 1D 2057 (en cas d'event 2048)
+Acheteurs prise de contrôle 2102
+Vendeurs prise de contrôle 2079
+Put sup. 0dte 2090 (put all 2070, 2050, 2025)
+Call res. 0dte 2100, 2110, 2125, 2150
+
+YMm25 gamma négatif. 
+Max 1D  43226 (en cas d event 43328)
+Min 1D 42411 (en cas d event 42310 )
+Prise de contrôle acheteurs 42896
+Prise de contrôle vendeurs 42670
+Put sup 0dte 42200 (all  42000, 41500, 41400)
+Call res 0dte 42500, 42800, 43000, (all 43500)
+
+derivatives — 27/03/2025 09:56
+GCj25 (surveillez GVZ) gamma positif
+Max 1D  2939 (en cas d'event 2948)
+Min 1D  2863 (en cas d'event 2854)
+Acheteurs prise de contrôle 2906
+Vendeurs prise de contrôle 2885
+Put sup. 2900 (all 2850, 2800)
+Call res.   2925 (all 2950, 2975, 3000)
+
+derivatives — 27/03/2025 09:56
+CLk25  Géopo  & OVX à Surveiller gamma négatif
+Max 1D 62.44 (event 62.76)
+Min 1D 60.02 (event 59.70)
+Acheteurs prise de contrôle 61.86
+Vendeurs prise de contrôle 61.16
+Put sup.  59.50 58.50 56.00 55.00 54.00 ( hedgies 69.50 69.00 68.00)
+Call res.   61.30 62.00 62.80 63.00 63.30
+
+NG k25 (US nat Gaz US front month futures HH) Gamma négatif surveiller NGVL
+Max 1D 3.59 (max event 3.67)
+Min 1D 3.00 (min event 2.93)
+Prise de contrôle acheteurs 3.36
+Prise de contrôle vendeurs 3.19
+Put sup 3.85, 3.50 (all 3.00, 2.75)
+Call res 4.10 ( All 4.25, 4.45 ; 4.80 ; 5.00)
+
+TTF k25 Gamma positif
+Max 1D 37.01 (event 37.64)
+Min 1D 31.58 ( event 30.88)
+Prise de contrôle acheteurs 35.69
+Prise de contrôle vendeurs 34.12
+Put sup 37.00, 36.00 35.00 34.00 32.00 30.00, 29.00,28.00
+Call res 39.00, 40.00, 45.00

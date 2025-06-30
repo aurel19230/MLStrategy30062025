@@ -1,0 +1,32 @@
+27/03/2025 09:56
+ESm25 (vix à surveiller)  gamma négatif 
+Max 1D 5884 (en cas d'event 5914)
+Min 1D 5650 (en cas d'event 5621) 
+Prise de contrôle acheteurs 5784
+Prise de contrôle vendeurs 5718
+Put sup. 0dte 5760 (all 5750, 5700,  5650, 5625)
+Call res. 0dte 5800 (all 5850, 5875, 5900, 5920)
+
+NQm25 (Sdex & VXN à surveiller) Gamma négatif
+Max 1D 20763 (en cas d'event 20921)
+Min 1D 19491 (en cas d'event 19333)
+Prise de contrôle acheteurs 20232
+Prise de contrôle vendeurs 19882
+Call res. 0dte 20500 (all 20550, 20600, 20700, 20800, 20850, 21000)
+Put sup 0dte 20100 (all 20050, 20000, 19900, 19850, 19800, 19700)
+
+RTY m25 (rvx à surveiller + IWM) Gamma négatif
+Max 1D 2098 (en cas event 2136)
+Min 1D 2057 (en cas d'event 2048)
+Acheteurs prise de contrôle 2102
+Vendeurs prise de contrôle 2079
+Put sup. 0dte 2090 (put all 2070, 2050, 2025)
+Call res. 0dte 2100, 2110, 2125, 2150
+
+YMm25 gamma négatif. 
+Max 1D  43226 (en cas d event 43328)
+Min 1D 42411 (en cas d event 42310 )
+Prise de contrôle acheteurs 42896
+Prise de contrôle vendeurs 42670
+Put sup 0dte 42200 (all  42000, 41500, 41400)
+Call res 0dte 42500, 42800, 43000, (all 43500)

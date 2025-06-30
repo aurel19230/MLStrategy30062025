@@ -1,0 +1,75 @@
+ESm25 (vix To Monitor)  negative Gamma 
+Max 1D 5980 (event 6008, extreme 6037)
+Min 1D 5749 (event 5720, extreme 5691) 
+Buyers Control 5890
+Sellers Control 5827
+Put sup. 0dte  5900, 5850, 5800, 5750, 5700 5680, 5600, 5500 (all 5575, 5500)
+Call res. 0dte 5925 5975 6000 (all 6020 6050)
+
+NQm25 (Sdex & VXN To Monitor) Positive Gamma
+Max 1D 21654 (event 21779, extreme 21904)
+Min 1D 20668 (event 20546, extreme 20424)
+Buyers Control 21273
+Sellers Control 21007
+Call res. 0dte 21225 21250 21350 21480, 21450 21550  (all 21600 21700)
+Put sup 0dte 21200 21000, (all 20850)
+
+RTY m25 (rvx To Monitor + IWM) Negative Gamma
+Max 1D 2103 (event 2115, extreme 2127)
+Min 1D 2004 (event 1992, extreme 1980)
+Buyers Control 2065
+Sellers Control 2039
+Put sup. 0dte   2075 2050 2025 (put all 2000)
+Call res. 0dte  2120, 2125 2140  2150 2160
+
+YMm25 Negative Gamma 
+Max 1D  42574 (event 42740, extreme 42901)
+Min 1D 41279 (event 41122, extreme 40961)
+Buyers Control 42082
+Sellers Control 41738
+Put sup 0dte 42400 42250 42200 (all  41400 41200 41000 40800)
+Call res 0dte 42500, 42750, 43000 (all 43250)
+
+GCm25 (GVZ To Monitor) Positive Gamma
+Max 1D  3378 (event 3388)
+Min 1D  3300 (event 3291)
+Buyers Control 3349
+Sellers Control 3327
+Put sup. 3315  3250 3225 3200 (all 3150 3125 3100 3050 3000)
+Call res.   3325 3250 , 3400 (all 3460 3500)
+
+6e
+Max 1D 1.1382
+Min 1D 1.1316
+Buyers Control 1.1367
+Sellers Control 1.1348
+Put sup 1.1150, 1.11, 1.1050, 1.0950,1.1000, 1.1050, 1.1100, 1.12, 1.1250,
+Call res  1.1450, 1.1500, 1.1550, 1.16, 1.1625, 1.1650, 1.17, 1.1750
+6j
+Max 1D 0.007036 (event 0.007046)
+Min 1D 0.006954 (event 0.006945)
+Buyers Control 0.006994
+Sellers Control 0.006971
+Put sup 0.007125 0.007075 0.007050 0.006900 0.006800
+Call res  0.007175, 0.007200, 0.007250, 0.007300
+6N
+Max 1D 0.5975
+Min 1D 0.5898
+Buyers Control 0.5956
+Sellers Control 0.5934
+Put sup 0.6000, 0.5950, 0.5900
+Call res  0.6075, 0.6100
+6S
+Max 1D 1.2221
+Min 1D 1.2096
+Buyers Control 1.2177
+Sellers Control 1.2141
+Put sup 1.2200 1.2100 1.1900, 1.1800, 1.1700
+Call res  1.2300 1.2400 1.2500
+6a
+Max 1D 0.6486
+Min 1D 0.6421
+Buyers Control 0.6457
+Sellers Control 0.6438
+Put sup 0.6425, 0.6400, 0.6375, 0.6350, 0.6300, 0.6250
+Call res  0.64, 0.6450

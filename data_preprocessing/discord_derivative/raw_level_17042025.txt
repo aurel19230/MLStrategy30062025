@@ -1,0 +1,32 @@
+derivatives — 17/04/2025 09:00
+ESm25 (vix à surveiller)  gamma négatif Opex
+Max 1D 5451 (en cas d'event 5477 extrême 5504)
+Min 1D 5239 (en cas d'event 5212 extrême 5186) 
+Prise de contrôle acheteurs 5375
+Prise de contrôle vendeurs 5318
+Put sup. 0dte 5400 (all 5300, 5150, 5100 5000, 4900 4800 4700)
+Call res. 0dte 5450, 5500 (all 5550 5600 5625, 5650, 5700 5800 5900 6000)
+
+NQm25 (Sdex & VXN à surveiller) Gamma négatiff Opex
+Max 1D 18954 (en cas d'event 19059 extrême 19164)
+Min 1D 18116 (en cas d'event 18008 extrême 17903)
+Prise de contrôle acheteurs 18690
+Prise de contrôle vendeurs 18458
+Call res. 0dte 18700(all 18800, 18950, 19200 19600, 19800, 20000)
+Put sup 0dte 19000, 18600 (all 18500, 18350, 18300, 18000, 17800)
+
+RTY m25 (rvx à surveiller + IWM) Gamma négatif opex
+Max 1D 1927 (en cas event 1936 extrême 1945)
+Min 1D 1854 (en cas d'event 1845 extrême 1836)
+Acheteurs prise de contrôle 1893
+Vendeurs prise de contrôle 1872
+Put sup. 0dte 1875 (put all 1810, 1800, 1790, 1750, 1700)
+Call res. 0dte  1850, 1900  1925,1940 1950 1975, 2000
+
+YMm25 gamma négatif opex
+Max 1D  40924 (en cas d event 41130 extrême 41328)
+Min 1D 39299 (en cas d event 39096 extrême 38890)
+Prise de contrôle acheteurs 40297
+Prise de contrôle vendeurs 39909
+Put sup 0dte 40400 (all  40000 39500, 39000, 38500, 38000)
+Call res 0dte 41000 41500 (all 41800, 42000, 42300)

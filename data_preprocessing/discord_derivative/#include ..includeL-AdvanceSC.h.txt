@@ -1,0 +1,1131 @@
+#include "..\include\L-AdvanceSC.h"
+
+
+
+
+std::map<std::string, TradingPeriod> initializeCustomSessions(SCStudyInterfaceRef sc, allowed_session_4Trading allowed_session_4Trading, std::map<std::string, TradingPeriod> CUSTOM_SESSIONS) {
+	// Structure de base des sessions
+	const std::map<std::string, TradingPeriod> BASE_SESSIONS = {
+		{"Opening", TradingPeriod(5, 117, 0, false, "22:05-23:57")},
+		{"Asie", TradingPeriod(123, 537, 1, false, "00:03-6:57")},
+		{"OpenUk", TradingPeriod(537, 543, 2, false, "6:57-07:03")},
+		{"preOpenEurope", TradingPeriod(543, 597, 2, false, "07:03-07:57")},
+		{"OpenEurope", TradingPeriod(597, 603, 2, false, "07:57-08:03")},
+		{"MorningEurope", TradingPeriod(603, 867, 2, false, "08:03-12:27")},
+		{"OpenpreOpenUS", TradingPeriod(867, 872, 3, false, "12:27-12:33")},
+		{"preOpenUS", TradingPeriod(872, 927, 3, false, "12:33-13:27")},
+		{"OpenMoringUS", TradingPeriod(927, 932, 3, false, "13:27-13:32")},
+		{"MoringUS", TradingPeriod(932, 1065, 3, false, "13:32-15:45")},
+		{"AfternonUS", TradingPeriod(1065, 1195, 4, false, "15:45-17:55")},
+		{"Evening", TradingPeriod(1195, 1280, 5, false, "17:55-19:20")},
+		{"Close", TradingPeriod(1280, 1365, 6, false, "19:20-20:45")}
+	};
+
+	// Clear existing sessions
+	CUSTOM_SESSIONS.clear();
+	CUSTOM_SESSIONS = BASE_SESSIONS;
+
+	// Appliquer les sélections selon le type de session
+	switch (allowed_session_4Trading) {
+	case ALLOW_ASIA_EUROPE:
+		for (auto& session : CUSTOM_SESSIONS) {
+			if (session.second.session_type_index <= 2) {  // Indices 0,1,2 pour Asie/Europe
+				session.second.selected = true;
+			}
+		}
+		break;
+
+	case ALLOW_US:
+		for (auto& session : CUSTOM_SESSIONS) {
+			const std::string& name = session.first;
+			if (name == "Opening" || name == "Asie" ||
+				name == "preOpenEurope" || name == "MorningEurope" ||
+				name == "preOpenUS" || name == "MoringUS" ||
+				name == "AfternonUS" || name == "Evening" ||
+				name == "Close") {
+				session.second.selected = true;
+			}
+		}
+		break;
+
+	case ALLOW_ALL:
+		for (auto& session : CUSTOM_SESSIONS) {
+			const std::string& name = session.first;
+			if (name != "OpenUk" && name != "OpenEurope" &&
+				name != "OpenpreOpenUS" && name != "OpenMoringUS") {
+				session.second.selected = true;
+			}
+		}
+		break;
+	}
+
+	return CUSTOM_SESSIONS;
+}
+
+
+
+bool isWeekend(int dayOfWeekUTC) {
+	return dayOfWeekUTC == ENUM_SATURDAY || dayOfWeekUTC == ENUM_SUNDAY;
+}
+
+bool isBeforeOpeningOnSunday(int dayOfWeekUTC, int currentMinute, std::map<std::string, TradingPeriod> CUSTOM_SESSIONS) {
+	if (dayOfWeekUTC != ENUM_SUNDAY) return false;
+
+	auto openingIt = CUSTOM_SESSIONS.find("Opening");
+	return openingIt != CUSTOM_SESSIONS.end() && currentMinute <= openingIt->second.start;
+}
+
+bool isInActiveTradingPeriod(int minutesSinceOpen, SCStudyInterfaceRef sc, std::map<std::string, TradingPeriod> CUSTOM_SESSIONS) {
+	for (const auto& period : CUSTOM_SESSIONS) {
+		//sc.AddMessageToLog(SCString().Format(
+			//"Checking period: %s, Start: %d, End: %d, Selected: %d, Minutes since open: %d",
+		//	period.first.c_str(), period.second.start, period.second.end, period.second.selected, minutesSinceOpen), 0);
+
+		if (period.second.selected &&
+			minutesSinceOpen >= period.second.start &&
+			minutesSinceOpen < period.second.end) {
+			//sc.AddMessageToLog(SCString().Format("Trading allowed in period: %s", period.first.c_str()), 0);
+			return true;
+		}
+	}
+	//sc.AddMessageToLog("No active trading period found.", 0);
+	return false;
+}
+
+
+is_trading_allowed paramTradingPeriod(SCStudyInterfaceRef sc, std::map<std::string, TradingPeriod> CUSTOM_SESSIONS) {
+	int year = sc.BaseDateTimeIn[sc.Index].GetYear();
+	int month = sc.BaseDateTimeIn[sc.Index].GetMonth();
+	int day = sc.BaseDateTimeIn[sc.Index].GetDay();
+	int hour = sc.BaseDateTimeIn[sc.Index].GetHour();
+	int minute = sc.BaseDateTimeIn[sc.Index].GetMinute();
+	int second = sc.BaseDateTimeIn[sc.Index].GetSecond();
+	std::time_t timestamp = dateToTimestampUTC(year, month, day, hour, minute, second);
+	normalDayLight_time currentDst = isDaylightSavingTime(timestamp, year);
+	normalDayLight_time lastDst = isDaylightSavingTime(timestamp - 86400, year);
+
+	// Calcul des heures de référence avec DST
+	int openHour = (lastDst == DAYLIGHT_TIME) ? 22 : 23;
+
+	// Conversion en minutes depuis minuit
+	int currentMinute = (hour * 60) + minute;
+
+	// Minutes écoulées depuis l'ouverture, avec gestion du passage de minuit
+	int minutesSinceOpen;
+	if (currentMinute >= openHour * 60) {
+		minutesSinceOpen = currentMinute - (openHour * 60);
+	}
+	else {
+		minutesSinceOpen = (24 * 60) - (openHour * 60) + currentMinute; // Ajout d'un jour complet
+	}
+	//sc.AddMessageToLog(SCString().Format("Current minute: %d, Open hour: %d, Minutes since open: %d",
+		//currentMinute, openHour, minutesSinceOpen), 0);
+
+	int dayOfWeekUTC;
+	int yearUTC;
+	int monthUTC;
+	int dayUTC;
+	int hourUTC;
+	int minuteUTC;
+	int secondUTC;
+
+	timestampToDateUTC(timestamp, yearUTC, monthUTC, dayUTC, hourUTC, minuteUTC, secondUTC, dayOfWeekUTC);
+
+
+	if (isWeekend(dayOfWeekUTC) && isBeforeOpeningOnSunday(dayOfWeekUTC, currentMinute, CUSTOM_SESSIONS)) {
+
+		sc.AddMessageToLog("isWeekend !", 0);
+		return TRADING_TIME_IS_BLOCK;
+	}
+
+	is_trading_allowed isInActive = isInActiveTradingPeriod(minutesSinceOpen, sc, CUSTOM_SESSIONS)
+		? TRADING_TIME_IS_POSSIBLE
+		: TRADING_TIME_IS_BLOCK;
+	/*if (isInActive == TRADING_IS_POSSIBLE)
+		sc.AddMessageToLog("isInActiveTradingPeriod !", 0);
+	else
+		sc.AddMessageToLog("not isInActiveTradingPeriod !", 0);*/
+
+	return isInActive;
+}
+
+std::map<float, int> tradeCountsMapUsSession;
+std::map<float, int> tradeCountsMapNotUsSession;
+std::map<float, int> tradeCountsMapAllSession;
+std::unordered_map<int, std::pair<float, float>> largeTrade_blwMin1_bullRev;
+std::unordered_map<int, std::pair<float, float>> largeTrade_abvMin1_bearRev;
+
+
+s_SCNewOrder OpenOrder(SCStudyInterfaceRef sc, order_type_LA order_type, strat_conditions_s s_strat_conditions, int sl_in_Tick,int  tp1_in_Tick, int  tp2_in_Tick, int tp3_in_Tick, int order_Quantity, int tp1_in_Qty, int tp2_in_Qty, int tp3_in_Qty, int tickReversalSize)
+{
+	SCString Message;
+	s_SCNewOrder LongOrder;
+	s_SCNewOrder ShortOrder;
+	int Result;
+
+	SCString message;
+	/*message.Format("quantités des ordes :\n Quantité totale = %d\n TP1 = %d\n TP2 = %d\n TP3 = %d\n Somme des QTY des TPs = %d",
+		order_Quantity,
+		tp1_in_Qty,
+		tp2_in_Qty,
+		tp3_in_Qty,
+		(tp1_in_Qty + tp2_in_Qty + tp3_in_Qty)
+	);*/
+	sc.AddMessageToLog(message, 1);
+
+	switch (order_type)
+	{
+	case (ORDDERTYPE_LONG):
+#ifdef DISPLAY_LOG
+		Message.Format("FIRE LONG => SL Price:%f || TP1 Price:%f , TP2 Price:%f, TP3 Price:%f",
+			s_strat_conditions.longSl_in_Price, s_strat_conditions.longTp1_in_Price, s_strat_conditions.longTp2_in_Price, s_strat_conditions.longTp3_in_Price);
+		sc.AddMessageToLog(Message, 0);
+#endif
+
+		LongOrder.TimeInForce = SCT_TIF_GTC;
+
+		LongOrder.OrderQuantity = order_Quantity;
+		LongOrder.OrderType = SCT_ORDERTYPE_MARKET;
+
+		// Configuration des cibles avec vérification des quantités
+		if (tp1_in_Qty > 0) {
+			LongOrder.Target1Price = s_strat_conditions.longTp1_in_Price;
+			LongOrder.AttachedOrderTarget1Type = SCT_ORDERTYPE_LIMIT; // Type d'ordre pour TP1
+			LongOrder.OCOGroup1Quantity = tp1_in_Qty;                // Quantité pour TP1
+		}
+		else {
+			LongOrder.OCOGroup1Quantity = 0; // Si TP1 est inactif, définir la quantité à 0
+		}
+
+		if (tp2_in_Qty > 0) {
+			LongOrder.Target2Price = s_strat_conditions.longTp2_in_Price;
+			LongOrder.AttachedOrderTarget2Type = SCT_ORDERTYPE_LIMIT; // Type d'ordre pour TP2
+			LongOrder.OCOGroup2Quantity = tp2_in_Qty;                // Quantité pour TP2
+		}
+		else {
+			LongOrder.OCOGroup2Quantity = 0; // Si TP2 est inactif, définir la quantité à 0
+		}
+
+		if (tp3_in_Qty > 0) {
+			LongOrder.Target3Price = s_strat_conditions.longTp3_in_Price;
+			LongOrder.AttachedOrderTarget3Type = SCT_ORDERTYPE_LIMIT; // Type d'ordre pour TP3
+			LongOrder.OCOGroup3Quantity = tp3_in_Qty;                // Quantité pour TP3
+		}
+		else {
+			LongOrder.OCOGroup3Quantity = 0; // Si TP3 est inactif, définir la quantité à 0
+		}
+
+		// Configuration du stop commun
+		LongOrder.StopAllPrice = s_strat_conditions.longSl_in_Price;
+		LongOrder.AttachedOrderStopAllType = SCT_ORDERTYPE_STOP; // Type d'ordre pour le stop
+
+		// Configuration du Move-to-Breakeven
+		LongOrder.MoveToBreakEven.Type = MOVETO_BE_ACTION_TYPE_OFFSET_TRIGGERED;
+		LongOrder.MoveToBreakEven.TriggerOffsetInTicks = s_strat_conditions.move2BeTriggerInTicks;
+		LongOrder.MoveToBreakEven.BreakEvenLevelOffsetInTicks = 0;
+
+		Result = sc.BuyEntry(LongOrder);
+		if (Result > 0)//order was accepted
+		{
+			//Take appropriate action if order is successful
+			// Remember the order ID for subsequent modification and cancellation
+			//InternalBuyMarketOrderID = LongOrder.InternalOrderID;
+#ifdef DISPLAY_LOG
+			Message.Format("LONG ACCEPTED");
+			sc.AddMessageToLog(Message, 0);
+#endif
+
+			return LongOrder;
+		}
+		else//order error
+		{
+			//Only report error if at the last bar
+			if (sc.Index == sc.ArraySize - 1)
+			{
+#ifdef DISPLAY_LOG
+
+				//Add error message to the Sierra Chart Message Log for interpretation
+				sc.AddMessageToLog(sc.GetTradingErrorTextMessage(Result), 0);
+#endif
+
+			}
+			if (Result <= 0) {
+#ifdef DISPLAY_LOG
+
+				sc.AddMessageToLog(sc.GetTradingErrorTextMessage(Result), 0);
+#endif
+				return LongOrder;
+			}
+		}
+		break;
+	case (ORDDERTYPE_SHORT):
+#ifdef DISPLAY_LOG
+
+		Message.Format("FIRE SHORT => SL Price:%f || TP1 Price:%f , TP2 Price:%f, TP3 Price:%f",
+			s_strat_conditions.shortSl_in_Price, s_strat_conditions.shortTp1_in_Price, s_strat_conditions.shortTp2_in_Price, s_strat_conditions.shortTp3_in_Price);
+		sc.AddMessageToLog(Message, 0);
+#endif
+
+		ShortOrder.TimeInForce = SCT_TIF_GTC;
+		ShortOrder.OrderQuantity = order_Quantity;
+		ShortOrder.OrderType = SCT_ORDERTYPE_MARKET;
+
+		// Configuration des cibles avec vérification des quantités
+		if (tp1_in_Qty > 0) {
+			ShortOrder.Target1Price = s_strat_conditions.shortTp1_in_Price;
+			ShortOrder.AttachedOrderTarget1Type = SCT_ORDERTYPE_LIMIT; // Type d'ordre pour TP1
+			ShortOrder.OCOGroup1Quantity = tp1_in_Qty;                // Quantité pour TP1
+		}
+		else {
+			ShortOrder.OCOGroup1Quantity = 0; // Si TP1 est inactif, définir la quantité à 0
+		}
+
+		if (tp2_in_Qty > 0) {
+			ShortOrder.Target2Price = s_strat_conditions.shortTp2_in_Price;
+			ShortOrder.AttachedOrderTarget2Type = SCT_ORDERTYPE_LIMIT; // Type d'ordre pour TP2
+			ShortOrder.OCOGroup2Quantity = tp2_in_Qty;                // Quantité pour TP2
+		}
+		else {
+			ShortOrder.OCOGroup2Quantity = 0; // Si TP2 est inactif, définir la quantité à 0
+		}
+
+		if (tp3_in_Qty > 0) {
+			ShortOrder.Target3Price = s_strat_conditions.shortTp3_in_Price;
+			ShortOrder.AttachedOrderTarget3Type = SCT_ORDERTYPE_LIMIT; // Type d'ordre pour TP3
+			ShortOrder.OCOGroup3Quantity = tp3_in_Qty;                // Quantité pour TP3
+		}
+		else {
+			ShortOrder.OCOGroup3Quantity = 0; // Si TP3 est inactif, définir la quantité à 0
+		}
+
+		// Configuration du stop
+
+
+		//Common Stop 
+		ShortOrder.StopAllPrice = s_strat_conditions.shortSl_in_Price;
+		ShortOrder.AttachedOrderStopAllType = SCT_ORDERTYPE_STOP;
+
+		// Set up a move to breakeven action for the common stop.  
+		// This is a common setting and applies to all Stop Attached Orders set on the main order. 
+		ShortOrder.MoveToBreakEven.Type = MOVETO_BE_ACTION_TYPE_OFFSET_TRIGGERED;
+
+		//After 5 ticks of profit, the stop order will be moved to breakeven 
+		ShortOrder.MoveToBreakEven.TriggerOffsetInTicks = s_strat_conditions.
+			move2BeTriggerInTicks;
+		ShortOrder.MoveToBreakEven.BreakEvenLevelOffsetInTicks = 0;
+
+		Result = sc.SellEntry(ShortOrder);
+		if (Result > 0)//order was accepted
+		{
+			
+			s_SCTradeOrder filledOrder;
+			if (sc.GetOrderByOrderID(ShortOrder.InternalOrderID, filledOrder) == 1) {
+				float actualEntryPrice = filledOrder.AvgFillPrice;
+
+				// Ajouter un log détaillé
+				SCString logMessage;
+				logMessage.Format("SHORT EXECUTION DETAILS:\n"
+					"  sc.Close: %.5f\n"
+					"  Entry Price: %.5f\n"
+					"  Order ID: %lld\n"
+					"  Filled Quantity: %.0f/%0.f\n"
+					"  Date/Time: %s\n"
+					"  Original Price: %.5f\n"
+					"  tickReversalSize: %d",
+					sc.Close[sc.Index],
+					actualEntryPrice,
+					(long long)ShortOrder.InternalOrderID,
+					(float)filledOrder.FilledQuantity,
+					(float)filledOrder.OrderQuantity,
+					sc.DateTimeToString(filledOrder.EntryDateTime, FLAG_DT_COMPLETE_DATETIME).GetChars(),
+					filledOrder.Price1,
+					tickReversalSize);
+				sc.AddMessageToLog(logMessage, 0);
+
+				//// Vérifier si le prix d'entrée théorique est différent du prix d'entrée réel
+				//if (sc.Close[sc.Index] != actualEntryPrice && filledOrder.FilledQuantity > 0) {
+				//	// Log de la différence de prix
+				//	SCString diffLog;
+				//	diffLog.Format("SHORT ORDER - PRICE DIFFERENCE DETECTED: Theoretical Entry: %.5f, Actual Entry: %.5f, Difference: %.5f ticks",
+				//		sc.Close[sc.Index],
+				//		actualEntryPrice,
+				//		(sc.Close[sc.Index] - actualEntryPrice) / sc.TickSize);
+				//	sc.AddMessageToLog(diffLog, 0);
+
+				//	// Ajuster TP1
+				//	if (ShortOrder.Target1InternalOrderID > 0) {
+				//		s_SCTradeOrder tp1Order;
+				//		if (sc.GetOrderByOrderID(ShortOrder.Target1InternalOrderID, tp1Order) == 1 && tp1Order.FilledQuantity == 0) {
+				//			float actualTp1Price = actualEntryPrice - tp1_in_Tick * sc.TickSize;
+
+				//			// Utiliser ModifyOrder avec un nouvel ordre
+				//			s_SCNewOrder modifyTP1;
+				//			modifyTP1.InternalOrderID = ShortOrder.Target1InternalOrderID;
+				//			modifyTP1.Price1 = actualTp1Price;
+				//			modifyTP1.OrderType = SCT_ORDERTYPE_LIMIT;  // Assurez-vous que c'est un ordre limite
+				//			int result = sc.ModifyOrder(modifyTP1);
+
+				//			if (result <= 0) {
+				//				SCString errorMsg;
+				//				errorMsg.Format("Error adjusting TP1: %s", sc.GetTradingErrorTextMessage(result));
+				//				sc.AddMessageToLog(errorMsg, 1);
+				//			}
+				//			else {
+				//				SCString tp1Log;
+				//				tp1Log.Format("TP1 Adjusted for SHORT: %.5f → %.5f", tp1Order.Price1, actualTp1Price);
+				//				sc.AddMessageToLog(tp1Log, 0);
+				//			}
+				//		}
+				//	}
+
+				//	// Ajuster TP2
+				//	if (ShortOrder.Target2InternalOrderID > 0) {
+				//		s_SCTradeOrder tp2Order;
+				//		if (sc.GetOrderByOrderID(ShortOrder.Target2InternalOrderID, tp2Order) == 1 && tp2Order.FilledQuantity == 0) {
+				//			float actualTp2Price = actualEntryPrice - tp2_in_Tick * sc.TickSize;
+
+				//			s_SCNewOrder modifyTP2;
+				//			modifyTP2.InternalOrderID = ShortOrder.Target2InternalOrderID;
+				//			modifyTP2.Price1 = actualTp2Price;
+				//			modifyTP2.OrderType = SCT_ORDERTYPE_LIMIT;
+				//			int result = sc.ModifyOrder(modifyTP2);
+
+				//			if (result <= 0) {
+				//				SCString errorMsg;
+				//				errorMsg.Format("Error adjusting TP2: %s", sc.GetTradingErrorTextMessage(result));
+				//				sc.AddMessageToLog(errorMsg, 1);
+				//			}
+				//			else {
+				//				SCString tp2Log;
+				//				tp2Log.Format("TP2 Adjusted for SHORT: %.5f → %.5f", tp2Order.Price1, actualTp2Price);
+				//				sc.AddMessageToLog(tp2Log, 0);
+				//			}
+				//		}
+				//	}
+
+				//	// Ajuster TP3
+				//	if (ShortOrder.Target3InternalOrderID > 0) {
+				//		s_SCTradeOrder tp3Order;
+				//		if (sc.GetOrderByOrderID(ShortOrder.Target3InternalOrderID, tp3Order) == 1 && tp3Order.FilledQuantity == 0) {
+				//			float actualTp3Price = actualEntryPrice - tp3_in_Tick * sc.TickSize;
+
+				//			s_SCNewOrder modifyTP3;
+				//			modifyTP3.InternalOrderID = ShortOrder.Target3InternalOrderID;
+				//			modifyTP3.Price1 = actualTp3Price;
+				//			modifyTP3.OrderType = SCT_ORDERTYPE_LIMIT;
+				//			int result = sc.ModifyOrder(modifyTP3);
+
+				//			if (result <= 0) {
+				//				SCString errorMsg;
+				//				errorMsg.Format("Error adjusting TP3: %s", sc.GetTradingErrorTextMessage(result));
+				//				sc.AddMessageToLog(errorMsg, 1);
+				//			}
+				//			else {
+				//				SCString tp3Log;
+				//				tp3Log.Format("TP3 Adjusted for SHORT: %.5f → %.5f", tp3Order.Price1, actualTp3Price);
+				//				sc.AddMessageToLog(tp3Log, 0);
+				//			}
+				//		}
+				//	}
+
+				//	// Ajuster SL
+				//	if (ShortOrder.Stop1InternalOrderID > 0) {
+				//		s_SCTradeOrder slOrder;
+				//		if (sc.GetOrderByOrderID(ShortOrder.Stop1InternalOrderID, slOrder) == 1 && slOrder.FilledQuantity == 0) {
+				//			float actualSlPrice = actualEntryPrice + tickReversalSize * sc.TickSize + sl_in_Tick * sc.TickSize;
+
+				//			s_SCNewOrder modifySL;
+				//			modifySL.InternalOrderID = ShortOrder.Stop1InternalOrderID;
+				//			modifySL.Price1 = actualSlPrice;
+				//			modifySL.OrderType = SCT_ORDERTYPE_STOP;  // Assurez-vous que c'est un ordre stop
+				//			int result = sc.ModifyOrder(modifySL);
+
+				//			if (result <= 0) {
+				//				SCString errorMsg;
+				//				errorMsg.Format("Error adjusting SL: %s", sc.GetTradingErrorTextMessage(result));
+				//				sc.AddMessageToLog(errorMsg, 1);
+				//			}
+				//			else {
+				//				SCString slLog;
+				//				slLog.Format("SL Adjusted for SHORT: %.5f → %.5f", slOrder.Price1, actualSlPrice);
+				//				sc.AddMessageToLog(slLog, 0);
+				//			}
+					//	}
+					//}
+				//}
+			}
+			else {
+				sc.AddMessageToLog("ShortOrder sc.GetOrderByOrderID fail", 0);
+			}
+			//Take appropriate action if order is successfull
+			// Remember the order ID for subsequent modification and cancellation
+			//InternalBuyMarketOrderID = ShortOrder.InternalOrderID;
+#ifdef DISPLAY_LOG
+			Message.Format("SHORT ACCEPTED");
+			sc.AddMessageToLog(Message, 0);
+#endif
+			return ShortOrder;
+		}
+		else//order error
+		{
+			//Only report error if at the last bar
+			if (sc.Index == sc.ArraySize - 1)
+			{
+#ifdef DISPLAY_LOG
+				//Add error message to the Sierra Chart Message Log for interpretation
+				sc.AddMessageToLog(sc.GetTradingErrorTextMessage(Result), 0);
+#endif
+			}
+			if (Result <= 0) {
+#ifdef DISPLAY_LOG
+				sc.AddMessageToLog(sc.GetTradingErrorTextMessage(Result), 0);
+#endif
+
+			}
+			return ShortOrder;
+		}
+		break;
+	default:
+		break;
+	}
+
+}
+void ManagePositionAndOrders(
+	SCStudyInterfaceRef sc,
+	int SCINDEX_1,
+	double& positionQuantity,
+	double& lastPositionQuantity,
+	int& incidentLongPos,
+	int& incidentShortPos,
+	int64_t& r_EntryInternalOrderID,
+	int64_t& r_EntryInternalTP1ID,
+	int64_t& r_EntryInternalTP2ID,
+	int64_t& r_EntryInternalSL1ID,
+	int64_t& r_EntryInternalTP3ID,
+	float& urgentExitTP3,
+	float& urgentExitSL,
+	int order_Quantity,
+	int tp1_in_Qty,
+	int tp2_in_Qty,
+	int tp3_in_Qty,
+	double sl_in_Tick,
+	double tp1_in_Tick,
+	double tp2_in_Tick,
+	double tp3_in_Tick,
+	int move2BeTriggerInTicks,
+	double bidPriceBarHigh,
+	double askPriceBarLow,
+	bool isHighAscending,
+	bool isLowDescending,
+	int position_entryTradeVSpoc,
+	bool isTradingTimePossible,
+	int& nb_long,
+	int& nb_short,
+	int& openTradeIndex,
+	float& openTradePrice,
+	int& index_1Trade, features_s& s_features,
+	int tickReversalSize
+)
+{
+	// If already in a position, check for urgent exits
+	if (positionQuantity > 0) // Long position
+	{
+#ifdef DISPLAY_LOG
+		SCString Message;
+		Message.Format("Already in a long position => positionQuantity: %.2f\n", positionQuantity);
+		sc.AddMessageToLog(Message, 0);
+#endif
+
+		s_SCTradeOrder TradeTP3, TradeSL;
+		sc.GetOrderByOrderID(r_EntryInternalTP3ID, TradeTP3);
+		double TP3Price = TradeTP3.Price1;
+		sc.GetOrderByOrderID(r_EntryInternalSL1ID, TradeSL);
+		double SLPrice = TradeSL.Price1;
+
+		// Urgent exit if price exceeds TP3 or falls below SL
+		if (sc.Close[sc.Index] - 1 * sc.TickSize > urgentExitTP3 || sc.Close[sc.Index] + 1 * sc.TickSize < urgentExitSL)
+		{
+			incidentLongPos++;
+			sc.FlattenAndCancelAllOrders();
+		}
+		lastPositionQuantity = positionQuantity;
+		return;
+	}
+	else if (positionQuantity < 0) // Short position
+	{
+#ifdef DISPLAY_LOG
+		SCString Message;
+		Message.Format("Already in a short position => positionQuantity: %.2f\n", positionQuantity);
+		sc.AddMessageToLog(Message, 0);
+#endif
+
+		s_SCTradeOrder TradeTP3, TradeSL;
+		sc.GetOrderByOrderID(r_EntryInternalTP3ID, TradeTP3);
+		double TP3Price = TradeTP3.Price1;
+		sc.GetOrderByOrderID(r_EntryInternalSL1ID, TradeSL);
+		double SLPrice = TradeSL.Price1;
+
+		// Urgent exit if price falls below TP3 or exceeds SL
+		if (sc.Close[sc.Index] + 1 * sc.TickSize < urgentExitTP3 || sc.Close[sc.Index] - 1 * sc.TickSize > urgentExitSL)
+		{
+			incidentShortPos++;
+			sc.FlattenAndCancelAllOrders();
+		}
+		lastPositionQuantity = positionQuantity;
+		return;
+	}
+
+	// Define strategy conditions
+	strat_conditions_s s_strat_conditions = {
+		sl_in_Tick * sc.TickSize + bidPriceBarHigh, // shortSl_in_Price
+		sc.Close[sc.Index] - tp1_in_Tick * sc.TickSize, // shortTp1_in_Price
+		sc.Close[sc.Index] - tp2_in_Tick * sc.TickSize, // shortTp2_in_Price
+		sc.Close[sc.Index] - tp3_in_Tick * sc.TickSize, // shortTp3_in_Price
+		askPriceBarLow - sl_in_Tick * sc.TickSize, // longSl_in_Price
+		sc.Close[sc.Index] + tp1_in_Tick * sc.TickSize, // longTp1_in_Price
+		sc.Close[sc.Index] + tp2_in_Tick * sc.TickSize, // longTp2_in_Price
+		sc.Close[sc.Index] + tp3_in_Tick * sc.TickSize, // longTp3_in_Price
+		move2BeTriggerInTicks // Move2ETriggerInTicks
+	};
+
+
+
+	//logMessage.Format("s_features.xTicksZoneType %d ", s_features.xTicksZoneType);
+	//sc.AddMessageToLog(logMessage, 0);
+	//sc.AddMessageToLog("", 0);
+
+	// Short scenario
+	if (isHighAscending && position_entryTradeVSpoc <= 0 
+		&& isTradingTimePossible == TRADING_TIME_IS_POSSIBLE 
+		&& s_features.xTicksContZoneType == CONT_BLW_ZONE
+#ifdef ENABLE_DOM
+		&& s_features.newsEventState == NEWS_EVENT_NOT
+#endif	
+		)
+	{
+		if ((sc.Close[SCINDEX_1] - sc.Open[sc.Index]) / sc.TickSize == 1) // no gap between close_1 and open
+		{
+#ifdef DISPLAY_LOG
+			SCDateTime timeClose_1 = sc.BaseDataEndDateTime[sc.Index - 1];
+			SCString date = sc.DateTimeToString(timeClose_1, FLAG_DT_COMPLETE_DATETIME);
+			SCString type = "Short at (previous close date) ";
+			sc.AddMessageToLog(type + date, 0);
+#endif
+
+			s_SCNewOrder newOrder = OpenOrder(sc, ORDDERTYPE_SHORT, s_strat_conditions, order_Quantity, sl_in_Tick,tp1_in_Tick, tp2_in_Tick, tp2_in_Tick,tp1_in_Qty, tp2_in_Qty, tp3_in_Qty, tickReversalSize);
+			lastPositionQuantity = -order_Quantity;
+			r_EntryInternalOrderID = newOrder.InternalOrderID;
+			r_EntryInternalTP1ID = newOrder.Target1InternalOrderID;
+			r_EntryInternalTP2ID = newOrder.Target2InternalOrderID;
+			r_EntryInternalSL1ID = newOrder.Stop1InternalOrderID;
+			r_EntryInternalTP3ID = newOrder.Target3InternalOrderID;
+			urgentExitTP3 = s_strat_conditions.shortTp3_in_Price;
+			urgentExitSL = s_strat_conditions.shortSl_in_Price;
+			openTradeIndex = sc.Index;
+			openTradePrice = sc.Close[sc.Index];
+			index_1Trade = SCINDEX_1;
+			nb_short++;
+
+#ifdef DISPLAY_LOG
+			SCString Message;
+			Message.Format(" nb long:%d || nb short:%d || nb tot:%d || incidentLongPos:%d || incidentShortPos:%d\n", nb_long, nb_short, nb_short + nb_long, incidentLongPos, incidentShortPos);
+			sc.AddMessageToLog(Message, 0);
+#endif
+		}
+	}
+	// Long scenario
+	else if (isLowDescending && position_entryTradeVSpoc >= 0 
+		&& isTradingTimePossible == TRADING_TIME_IS_POSSIBLE 
+		&& s_features.xTicksContZoneType == CONT_ABV_ZONE
+#ifdef ENABLE_DOM
+		&& s_features.newsEventState == NEWS_EVENT_NOT)
+#endif			 
+		)
+	{
+		if ((sc.Open[sc.Index] - sc.Close[SCINDEX_1]) / sc.TickSize == 1) // no gap between close_1 and open
+		{
+#ifdef DISPLAY_LOG
+			SCDateTime timeClose_1 = sc.BaseDataEndDateTime[sc.Index - 1];
+			SCString date = sc.DateTimeToString(timeClose_1, FLAG_DT_COMPLETE_DATETIME);
+			SCString type = "Long at (previous close date) ";
+			sc.AddMessageToLog(type + date, 0);
+#endif
+
+			s_SCNewOrder newOrder = OpenOrder(sc, ORDDERTYPE_LONG, s_strat_conditions, order_Quantity,sl_in_Tick,tp1_in_Tick, tp2_in_Tick, tp2_in_Tick, tp1_in_Qty, tp2_in_Qty, tp3_in_Qty, tickReversalSize);
+			lastPositionQuantity = order_Quantity;
+			r_EntryInternalOrderID = newOrder.InternalOrderID;
+			r_EntryInternalTP1ID = newOrder.Target1InternalOrderID;
+			r_EntryInternalTP2ID = newOrder.Target2InternalOrderID;
+			r_EntryInternalSL1ID = newOrder.Stop1InternalOrderID;
+			r_EntryInternalTP3ID = newOrder.Target3InternalOrderID;
+			urgentExitTP3 = s_strat_conditions.longTp3_in_Price;
+			urgentExitSL = s_strat_conditions.longSl_in_Price;
+			openTradeIndex = sc.Index;
+			openTradePrice = sc.Close[sc.Index];
+			index_1Trade = sc.Index - 1;
+			nb_long++;
+
+#ifdef DISPLAY_LOG
+			SCString Message;
+			Message.Format(" nb long:%d || nb short:%d || nb tot:%d || incidentLongPos:%d || incidentShortPos:%d\n", nb_long, nb_short, nb_short + nb_long, incidentLongPos, incidentShortPos);
+			sc.AddMessageToLog(Message, 0);
+#endif
+		}
+	}
+}
+
+void ProcessTradeClosure(
+	SCStudyInterfaceRef sc, s_SCPositionData& positionData, double& lastPositionQuantity,
+	float tp1_in_Tick, float sl_in_Tick, int r_EntryInternalOrderID,
+	int r_EntryInternalTP1ID, int r_EntryInternalTP2ID, int r_EntryInternalTP3ID,
+	int r_EntryInternalSL1ID, float& cumulative_gross_profits, float& cumulative_gross_losses,
+	float& cumulative_net_pnl_custom, float& total_fees, float& cumulative_gross_profits_long,
+	float& cumulative_gross_losses_long, float& cumulative_gross_profits_short,
+	float& cumulative_gross_losses_short, float& cumulative_net_profits_long,
+	float& cumulative_net_losses_long, float& cumulative_net_profits_short,
+	float& cumulative_net_losses_short, float& cumulative_nb_long, float& cumulative_win_long,
+	float& cumulative_nb_short, float& cumulative_win_short, float& cumulative_winRateLong,
+	float& cumulative_winRateShort, int& index_1Trade,
+	std::vector<std::vector<double>>& tradeDataList,
+	float input_fees_perRound, int tickReversalSize,
+	std::ofstream& of_trade_result_dataVectNew
+)
+{
+	if ((positionData.PositionQuantity == 0) && (std::abs(lastPositionQuantity) > 0)) {
+		std::string targetTP1_string = std::to_string(tp1_in_Tick);
+		std::string targetSL_string = std::to_string(sl_in_Tick);
+		float averageWinLong = 0.0f;
+		float averageLossLong = 0.0f;
+		float averageWinShort = 0.0f;
+		float averageLossShort = 0.0f;
+		float averageWinTotal = 0.0f;
+		float averageLossTotal = 0.0f;
+		// Reset and direction determination
+		lastPositionQuantity = 0;
+		bool isLong = (positionData.PriorPositionQuantity > 0);
+
+		float profitTP1_brut = 0.0f;
+		float profitTP2_brut = 0.0f;
+		float profitTP3_brut = 0.0f;
+		float lossSL_brut = 0.0f;
+
+		// Variables pour la somme brute ET nette sur CE trade
+		float lastTradePnl_brut = 0.0f;
+		enum_lastTrade_result lastTradeResult = NO_TRADE;
+		float lastTradePnl_net = 0.0f;
+		float lastTradeFees = 0.0f;
+		float profitTP1_net = 0, profitTP2_net = 0, profitTP3_net = 0, lossSL_net = 0;
+
+
+
+		// Récupération du paramètre de commissions Round-Turn par lot
+
+
+		// --- Log de la fermeture de position ---
+		double entryPrice = 0.0;
+		s_SCTradeOrder TradeOrder, TradeTP1, TradeTP2, TradeTP3, TradeSL;
+
+		// Vérifier si on récupère bien l'ordre d'entrée
+		if (sc.GetOrderByOrderID(r_EntryInternalOrderID, TradeOrder) != 1) {
+			sc.AddMessageToLog("Error: Unable to retrieve entry order details", 0);
+			return;
+		}
+
+		entryPrice = TradeOrder.AvgFillPrice;
+
+		// Récupération TPs et SL
+		sc.GetOrderByOrderID(r_EntryInternalTP1ID, TradeTP1);
+		sc.GetOrderByOrderID(r_EntryInternalTP2ID, TradeTP2);
+		sc.GetOrderByOrderID(r_EntryInternalTP3ID, TradeTP3);
+		sc.GetOrderByOrderID(r_EntryInternalSL1ID, TradeSL);
+
+		// Log direction et prix d'entrée
+		SCString dateTimeString = sc.DateTimeToString(TradeOrder.EntryDateTime, FLAG_DT_COMPLETE_DATETIME);
+
+		//SCString directionMsg;
+		//directionMsg.Format(
+		//	"Position closed at %s- %s, Entry Price: %.2f | Rev: %d ticks | TargetTP1: %s, SL: %s",
+		//	dateTimeString.GetChars(),  // Date et heure
+		//	isLong ? "LONG" : "SHORT", // Direction de la position
+		//	entryPrice,                // Prix d'entrée
+		//	tickReversalSize,
+		//	targetTP1_string.c_str(),  // TP1 (converti en const char* avec .c_str())
+		//	targetSL_string.c_str()    // SL (converti en const char* avec .c_str())
+		//);
+		//sc.AddMessageToLog(directionMsg, 0);
+
+		// ---------------------------
+		// 1) TP1 Analysis
+		// ---------------------------
+		if (TradeTP1.FilledQuantity > 0) {
+			float FilledQty_tp1 = TradeTP1.FilledQuantity;
+
+			// Profit brut
+			profitTP1_brut = isLong
+				? (TradeTP1.AvgFillPrice - entryPrice) * FilledQty_tp1 * sc.CurrencyValuePerTick / sc.TickSize
+				: (entryPrice - TradeTP1.AvgFillPrice) * FilledQty_tp1 * sc.CurrencyValuePerTick / sc.TickSize;
+
+			// Commissions (Round-turn) => 2x la commission unitaire * FilledQty
+			float feesTP1 = FilledQty_tp1 * input_fees_perRound * 2.0f;
+
+			// Profit net
+			profitTP1_net = profitTP1_brut - feesTP1;
+
+			// Cumul sur CE trade
+			lastTradePnl_brut += profitTP1_brut;
+			lastTradePnl_net += profitTP1_net;
+			lastTradeFees += feesTP1;
+			lastTradeResult = isLong? LONG_SUCCESS : SHORT_SUCCESS;
+
+			// Log TP1
+			//SCString tp1ResultMsg;
+			//tp1ResultMsg.Format(
+			//	"TP1 Hit: Price %.2f, Filled=%.0f/%.0f, Profit BRUT=$%.2f, Fees=$%.2f-> Net=$%.2f",
+			//	TradeTP1.AvgFillPrice,
+			//	FilledQty_tp1,
+			//	TradeTP1.OrderQuantity,
+			//	profitTP1_brut,
+			//	feesTP1,
+			//	profitTP1_net
+			//);
+			//sc.AddMessageToLog(tp1ResultMsg, 0);
+		}
+
+		// ---------------------------
+		// 2) TP2 Analysis
+		// ---------------------------
+		if (TradeTP2.FilledQuantity > 0) {
+			float FilledQty_tp2 = TradeTP2.FilledQuantity;
+
+			profitTP2_brut = isLong
+				? (TradeTP2.AvgFillPrice - entryPrice) * FilledQty_tp2 * sc.CurrencyValuePerTick / sc.TickSize
+				: (entryPrice - TradeTP2.AvgFillPrice) * FilledQty_tp2 * sc.CurrencyValuePerTick / sc.TickSize;
+
+			float feesTP2 = FilledQty_tp2 * input_fees_perRound * 2.0f;
+			profitTP2_net = profitTP2_brut - feesTP2;
+
+			lastTradePnl_brut += profitTP2_brut;
+			lastTradePnl_net += profitTP2_net;
+			lastTradeFees += feesTP2;
+
+			SCString tp2ResultMsg;
+			tp2ResultMsg.Format(
+				"TP2 Hit: Price %.2f, Filled=%.0f/%.0f, Profit BRUT=$%.2f, Fees=$%.2f-> Net=$%.2f",
+				TradeTP2.AvgFillPrice,
+				FilledQty_tp2,
+				TradeTP2.OrderQuantity,
+				profitTP2_brut,
+				feesTP2,
+				profitTP2_net
+			);
+			sc.AddMessageToLog(tp2ResultMsg, 0);
+		}
+
+		// ---------------------------
+		// 3) TP3 Analysis
+		// ---------------------------
+		if (TradeTP3.FilledQuantity > 0) {
+			float FilledQty_tp3 = TradeTP3.FilledQuantity;
+
+			profitTP3_brut = isLong
+				? (TradeTP3.AvgFillPrice - entryPrice) * FilledQty_tp3 * sc.CurrencyValuePerTick / sc.TickSize
+				: (entryPrice - TradeTP3.AvgFillPrice) * FilledQty_tp3 * sc.CurrencyValuePerTick / sc.TickSize;
+
+			float feesTP3 = FilledQty_tp3 * input_fees_perRound * 2.0f;
+			float profitTP3_net = profitTP3_brut - feesTP3;
+
+			lastTradePnl_brut += profitTP3_brut;
+			lastTradePnl_net += profitTP3_net;
+			lastTradeFees += feesTP3;
+
+			SCString tp3ResultMsg;
+			tp3ResultMsg.Format(
+				"TP3 Hit: Price %.2f, Filled=%.0f/%.0f, Profit BRUT=$%.2f, Fees=$%.2f-> Net=$%.2f",
+				TradeTP3.AvgFillPrice,
+				FilledQty_tp3,
+				TradeTP3.OrderQuantity,
+				profitTP3_brut,
+				feesTP3,
+				profitTP3_net
+			);
+			sc.AddMessageToLog(tp3ResultMsg, 0);
+		}
+
+		// ---------------------------
+		// 4) Stop Loss Analysis
+		// ---------------------------
+		if (TradeSL.FilledQuantity > 0) {
+			float FilledQty_sl = TradeSL.FilledQuantity;
+			SCString debugMsg;
+
+			lossSL_brut = isLong
+				? (TradeSL.AvgFillPrice - entryPrice) * FilledQty_sl * sc.CurrencyValuePerTick / sc.TickSize
+				: (entryPrice - TradeSL.AvgFillPrice) * FilledQty_sl * sc.CurrencyValuePerTick / sc.TickSize;
+
+			float feesSL = FilledQty_sl * input_fees_perRound * 2.0f;
+			lossSL_net = lossSL_brut - feesSL;
+
+			lastTradePnl_brut += lossSL_brut;
+			lastTradePnl_net += lossSL_net;
+			lastTradeFees += feesSL;
+
+			lastTradeResult = isLong ? LONG_FAIL : SHORT_FAIL;
+
+
+			//debugMsg.Format("Debug: short, Filled=%.2f, lastPositionQuantity=%.2f  lastTradeFees=%.2f ",
+			//	TradeSL.FilledQuantity,
+			//	lastPositionQuantity, lastTradeFees
+			//);
+			//sc.AddMessageToLog(debugMsg, 0);
+
+			//SCString slResultMsg;
+			//slResultMsg.Format(
+			//	"SL Hit: Price %.2f, Filled=%.0f/%.0f, Loss BRUT=$%.2f, Fees=$%.2f-> Net=$%.2f",
+			//	TradeSL.AvgFillPrice,
+			//	FilledQty_sl,
+			//	TradeSL.OrderQuantity,
+			//	lossSL_brut,
+			//	feesSL,
+			//	lossSL_net
+			//);
+			//sc.AddMessageToLog(slResultMsg, 0);
+		}
+
+		// ----------------------------------------------------------------
+		// 5) FIN DU TRADE => Mise à jour des agrégats bruts & nets
+		// ----------------------------------------------------------------
+
+		// lastTradePnl_brut et lastTradePnl_net sont sur CE trade
+		// lastTradeFees = total commissions de CE trade
+		total_fees += lastTradeFees;
+
+		// Mise à jour brut (Gross) global
+		if (lastTradePnl_brut > 0.0f) {
+			cumulative_gross_profits += lastTradePnl_brut;
+			if (isLong)
+				cumulative_gross_profits_long += lastTradePnl_brut;
+			else
+				cumulative_gross_profits_short += lastTradePnl_brut;
+		}
+		else {
+			float absLoss = std::fabs(lastTradePnl_brut);
+			cumulative_gross_losses += absLoss;
+			if (isLong)
+				cumulative_gross_losses_long += absLoss;
+			else
+				cumulative_gross_losses_short += absLoss;
+		}
+
+		// Mise à jour net (après frais)
+		// Note: On peut stocker le PnL net total dans "cumulative_net_pnl_custom"
+		cumulative_net_pnl_custom += lastTradePnl_net;
+
+		if (lastTradePnl_net > 0.0f) {
+			if (isLong)
+				cumulative_net_profits_long += lastTradePnl_net;
+			else
+				cumulative_net_profits_short += lastTradePnl_net;
+		}
+		else {
+			float absLossNet = std::fabs(lastTradePnl_net);
+			if (isLong)
+				cumulative_net_losses_long += absLossNet;
+			else
+				cumulative_net_losses_short += absLossNet;
+		}
+
+		// Comptage des trades (win/lose, etc.)
+		if (isLong) {
+			cumulative_nb_long++;
+			if (lastTradePnl_net > 0) {
+				cumulative_win_long++;
+				cumulative_winRateLong = (cumulative_nb_long > 0)
+					? (cumulative_win_long / cumulative_nb_long * 100.0f)
+					: 0.0f;
+			}
+		}
+		else {
+			cumulative_nb_short++;
+			if (lastTradePnl_net > 0) {
+				cumulative_win_short++;
+				cumulative_winRateShort = (cumulative_nb_short > 0)
+					? (cumulative_win_short / cumulative_nb_short * 100.0f)
+					: 0.0f;
+			}
+		}
+
+		// ----------------------------------------------------------------
+		// 6) Calcul des Profit Factors bruts et nets
+		// ----------------------------------------------------------------
+
+		float profit_factor_brut_total = (cumulative_gross_losses > 0.0f)
+			? (cumulative_gross_profits / cumulative_gross_losses)
+			: 0.0f;
+
+		float cumulative_net_losses_long_abs = (cumulative_net_losses_long > 0 ? cumulative_net_losses_long : 0.0f);
+		float cumulative_net_losses_short_abs = (cumulative_net_losses_short > 0 ? cumulative_net_losses_short : 0.0f);
+
+
+		float totalNetLosses = (cumulative_net_losses_long_abs + cumulative_net_losses_short_abs);
+		float totalNetProfits = (cumulative_net_profits_long + cumulative_net_profits_short);
+		float net_profit_factor_total = (totalNetLosses > 0.0f)
+			? (totalNetProfits / totalNetLosses)
+			: 0.0f;
+
+		float profit_factor_net_long = 0;
+		float profit_factor_net_short = 0;
+		// PF net long
+		if (cumulative_net_losses_long_abs > 0.0f)
+			profit_factor_net_long = cumulative_net_profits_long / cumulative_net_losses_long_abs;
+
+		// PF net short
+		if (cumulative_net_losses_short_abs > 0.0f)
+			profit_factor_net_short = cumulative_net_profits_short / cumulative_net_losses_short_abs;
+
+		// ----------------------------------------------------------------
+		// 7) Calcul de l'expected PNL
+		// ----------------------------------------------------------------
+		float cumulative_winRate = (cumulative_nb_short + cumulative_nb_long > 0) ?
+			((cumulative_win_long + cumulative_win_short) / (cumulative_nb_short + cumulative_nb_long) * 100.0f) : 0.0f;
+
+		// Calcul des moyennes pour les positions longues
+		if (cumulative_win_long > 0) {
+			averageWinLong = cumulative_net_profits_long / cumulative_win_long;
+		}
+		if (cumulative_nb_long - cumulative_win_long > 0) {
+			averageLossLong = cumulative_net_losses_long / (cumulative_nb_long - cumulative_win_long);
+		}
+
+		// Calcul des moyennes pour les positions courtes
+		if (cumulative_win_short > 0) {
+			averageWinShort = cumulative_net_profits_short / cumulative_win_short;
+		}
+		if (cumulative_nb_short - cumulative_win_short > 0) {
+			averageLossShort = cumulative_net_losses_short / (cumulative_nb_short - cumulative_win_short);
+		}
+
+		// Calcul des moyennes globales
+		if (cumulative_win_long + cumulative_win_short > 0) {
+			averageWinTotal = (cumulative_net_profits_long + cumulative_net_profits_short) / (cumulative_win_long + cumulative_win_short);
+		}
+		if ((cumulative_nb_long + cumulative_nb_short) - (cumulative_win_long + cumulative_win_short) > 0) {
+			averageLossTotal = (cumulative_net_losses_long + cumulative_net_losses_short) / ((cumulative_nb_long + cumulative_nb_short) - (cumulative_win_long + cumulative_win_short));
+		}
+
+		// Calcul de l'Expected PnL
+		float expectedPnlLong = (cumulative_winRateLong / 100.0f * averageWinLong) - ((1.0f - cumulative_winRateLong / 100.0f) * averageLossLong);
+		float expectedPnlShort = (cumulative_winRateShort / 100.0f * averageWinShort) - ((1.0f - cumulative_winRateShort / 100.0f) * averageLossShort);
+		float expectedPnlTotal = (cumulative_winRate / 100.0f * averageWinTotal) - ((1.0f - cumulative_winRate / 100.0f) * averageLossTotal);
+
+		//// ----------------------------------------------------------------
+		//// 8) Logs finaux
+		//// ----------------------------------------------------------------
+		//// a) Résumé du trade
+		//SCString tradeSummaryMsg;
+		//tradeSummaryMsg.Format(
+		//	"=> Trade Summary: GROSS=%.2f, Fees=%.2f, NET->%.2f",
+		//	lastTradePnl_brut,
+		//	lastTradeFees,
+		//	lastTradePnl_net
+		//);
+		//sc.AddMessageToLog(tradeSummaryMsg, 0);
+
+		//// b) PnL cumulés (brut & net)
+		//SCString pnlMsg;
+		//pnlMsg.Format(
+		//	"Cumulated => GrossProfit=$%.2f / GrossLoss=$%.2f  |  NetPnL=$%.2f  |  FeesTotal=$%.2f",
+		//	cumulative_gross_profits,
+		//	cumulative_gross_losses,
+		//	cumulative_net_pnl_custom,
+		//	total_fees
+		//);
+		//sc.AddMessageToLog(pnlMsg, 0);
+
+		//// c) Profit Factor
+		//SCString pfMsg;
+		//pfMsg.Format(
+		//	"ProfitFactor => Gross=%.2f | NetPFTot=%.2f | NetPF Long=%.2f | NetPF Short=%.2f",
+		//	profit_factor_brut_total,
+		//	net_profit_factor_total,
+		//	profit_factor_net_long,
+		//	profit_factor_net_short
+		//);
+		//sc.AddMessageToLog(pfMsg, 0);
+
+		//SCString wrMsg;
+		//wrMsg.Format(
+		//	"WinRate Total = %.1f%% (%.0f/%.0f)| WinRate Long=%.1f%% (%.0f/%.0f) | WinRate Short=%.1f%% (%.0f/%.0f)",
+		//	cumulative_winRate, cumulative_win_long + cumulative_win_short, cumulative_nb_short + cumulative_nb_long,
+		//	cumulative_winRateLong, cumulative_win_long, cumulative_nb_long,
+		//	cumulative_winRateShort, cumulative_win_short, cumulative_nb_short
+		//);
+		//sc.AddMessageToLog(wrMsg, 0);
+
+		//// Log de l'Expected PnL Net
+		//SCString expectedPnlMsg;
+		//expectedPnlMsg.Format(
+		//	"Expected PnL Net => Total=$%.2f | Long=$%.2f | Short=$%.2f",
+		//	expectedPnlTotal,
+		//	expectedPnlLong,
+		//	expectedPnlShort
+		//);
+
+		//// Calcul du profit moyen par trade gagné (brut)
+		//float avgProfitPerWinTotal = (cumulative_win_long + cumulative_win_short > 0)
+		//	? (cumulative_gross_profits / (cumulative_win_long + cumulative_win_short))
+		//	: 0.0f;
+
+		//// Calcul du profit moyen par trade perdu (brut)
+		//float avgLossPerLossTotal = ((cumulative_nb_long + cumulative_nb_short) - (cumulative_win_long + cumulative_win_short) > 0)
+		//	? (cumulative_gross_losses / ((cumulative_nb_long + cumulative_nb_short) - (cumulative_win_long + cumulative_win_short)))
+		//	: 0.0f;
+		//sc.AddMessageToLog(expectedPnlMsg, 0);
+		//// Affichage des logs avec les profits moyens globaux
+		//SCString avgPnlMsg;
+		//avgPnlMsg.Format(
+		//	"Avg Profit per Win => $%.2f | Avg Loss per Loss => $%.2f",
+		//	avgProfitPerWinTotal, avgLossPerLossTotal
+		//);
+		//sc.AddMessageToLog(avgPnlMsg, 0);
+		//float totalPnL = positionData.CumulativeProfitLoss;
+		//SCString totalPnLSC;
+		//totalPnLSC.Format("DEBUG: totalPnL: %.2f", totalPnL);
+		//sc.AddMessageToLog(totalPnLSC, 0);
+
+		//double rounded_pnl = roundToTwoDecimalPlaces(cumulative_net_pnl_custom + total_fees);
+		//double rounded_totalPnL = roundToTwoDecimalPlaces(totalPnL);
+
+		//if ((rounded_pnl) != rounded_totalPnL) {
+		//	SCString debug;
+		//	debug.Format("ERROR : cumulative_net_pnl_custom + total_fees ($%.2f) != totalPnL ($%.2f)",
+		//		cumulative_net_pnl_custom + total_fees, totalPnL);
+		//	sc.AddMessageToLog(debug, 0);
+
+		//	// Calcul de l'écart en pourcentage
+		//	float ecartAbsolu = fabs((cumulative_net_pnl_custom + total_fees) - totalPnL);
+		//	float ecartPourcentage = (ecartAbsolu / fabs(totalPnL)) * 100.0f;
+
+		//	// Vérification de l'écart
+		//	if (ecartPourcentage > 112.50f && (cumulative_net_pnl_custom + total_fees) != 0 && totalPnL != 0) {
+		//		SCString stopReplayMsg;
+		//		stopReplayMsg.Format("Écart de %.2f%% supérieur à 12.5%%. Arrêt du replay.", ecartPourcentage);
+		//		sc.AddMessageToLog(stopReplayMsg, 0);
+
+		//		// Arrêt du replay
+		//		sc.PauseChartReplay(sc.ChartNumber); // Met le replay en pause
+		//	}
+		//}
+
+		int tradeResult = lastTradeResult;
+		//if (lastTradePnl_brut > 0)
+		//	tradeResult = isLong ? 1 : 2;
+		//else
+		//	tradeResult = isLong ? -1 : -2;
+		
+
+
+		StoreTradeList(sc, tradeDataList, index_1Trade, tradeResult, lastTradePnl_net,
+			profitTP1_net, profitTP2_net, profitTP3_net, lossSL_net,
+			of_trade_result_dataVectNew);
+	}
+}

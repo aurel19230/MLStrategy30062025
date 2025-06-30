@@ -1,0 +1,6 @@
+Erreurs détectées lors de l'analyse du fichier C:\Users\aulac\OneDrive\Documents\Trading\PyCharmProject\MLStrategy\data_preprocessing\discord_derivative\raw_level_13052025.txt:
+
+- Date 13/05/2025, Ticker ESm25: Éléments manquants: Gamma
+- Date 13/05/2025, Ticker NQm25: Éléments manquants: Gamma
+- Date 13/05/2025, Ticker RTY m25: Éléments manquants: Gamma
+- Date 13/05/2025, Ticker YMm25: Éléments manquants: Gamma

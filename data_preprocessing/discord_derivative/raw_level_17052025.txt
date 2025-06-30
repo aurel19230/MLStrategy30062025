@@ -1,0 +1,75 @@
+ESm25 (vix To Monitor)  Positive Gamma 
+Max 1D 5978 (event 5995, extreme 6011)
+Min 1D 5850 (event 5834, extreme 5817) 
+Buyers Control 5948
+Sellers Control 5911
+Put sup. 0dte 5950 5900, 5850, 5800, 5750, 5700 5680, 5600, 5500 (all 5575, 5500)
+Call res. 0dte 5925 (all 5955 5975, 6000 6020 6035, 6100)
+
+NQm25 (Sdex & VXN To Monitor) Positive Gamma
+Max 1D 21540 (event 21621, extreme 21699)
+Min 1D 20906 (event 20828, extreme 20747)
+Buyers Control 21371
+Sellers Control 21186
+Call res. 0dte 21490 21570 (all 21600 21700 21800 22000)
+Put sup 0dte 21500, 21400, 21300, 21250, 21100, 21000, (all 20850)
+
+RTY m25 (rvx To Monitor + IWM) Positive Gamma
+Max 1D 2123 (event 2130, extreme 2137)
+Min 1D 2068 (event 2062, extreme 2055)
+Buyers Control 2110
+Sellers Control 2094
+Put sup. 0dte  2110 2100 (put all 2090 2060, 2050)
+Call res. 0dte  2075, 2120, 2125 2140  2150 2160
+
+YMm25 Positive Gamma 
+Max 1D  42794 (event 42889, extreme 42983)
+Min 1D 42041 (event 41947, extreme 41854)
+Buyers Control 42642
+Sellers Control 42458
+Put sup 0dte 42600, 42400 42300 42000 41600, 41500, 41400 (all  41200 41000 40800)
+Call res 0dte 42750, 43000, 43250 (all 43700)
+
+6e
+Max 1D 1.1288
+Min 1D 1.1122
+Buyers Control 1.1223
+Sellers Control 1.1177
+Put sup 1.1150, 1.11, 1.1050, 1.0950,1.1000, 1.1050, 1.1100, 1.12, 1.1250,
+Call res  1.1450, 1.1500, 1.1550, 1.16, 1.1625, 1.1650, 1.17, 1.1750
+6j
+Max 1D 0.006958 (event 0.006972)
+Min 1D 0.006853 (event 0.006839)
+Buyers Control 0.006927
+Sellers Control 0.006897
+Put sup 0.007125 0.007075 0.007050 0.006900 0.006800
+Call res  0.007175, 0.007200, 0.007250, 0.007300
+6N
+Max 1D 0.5941
+Min 1D 0.5851
+Buyers Control 0.5905
+Sellers Control 0.5880
+Put sup 0.6000, 0.5950, 0.5900
+Call res  0.6075, 0.6100
+6S
+Max 1D 1.2106
+Min 1D 1.1902
+Buyers Control 1.2032
+Sellers Control 1.1975
+Put sup 1.2200 1.2100 1.1900, 1.1800, 1.1700
+Call res  1.2300 1.2400 1.2500
+6a
+Max 1D 0.6450
+Min 1D 0.6374
+Buyers Control 0.6422
+Sellers Control 0.6400
+Put sup 0.6425, 0.6400, 0.6375, 0.6350, 0.6300, 0.6250
+Call res  0.64, 0.645
+
+GCm25 (GVZ To Monitor) Negative Gamma
+Max 1D  3296 (event 3316)
+Min 1D  3139 (event 3120)
+Buyers Control 3223
+Sellers Control 3178
+Put sup. 3215  3200 3180 3175 (all 3150 3125 3100 3050 3000)
+Call res.   3235 3245 , 3275 3300 (all 3330 3350 3400)

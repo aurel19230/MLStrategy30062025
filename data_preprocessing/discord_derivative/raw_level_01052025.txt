@@ -1,0 +1,114 @@
+ESm25 (vix à surveiller)  gamma négatif léger 
+Max 1D 5771 (en cas d'event 5801, extreme 5832)
+Min 1D 5523 (en cas d'event 5493, extreme 5462) 
+Prise de contrôle acheteurs 5676
+Prise de contrôle vendeurs 5604
+Put sup. 0dte 5575, 5525 (all 5500, 5450, 5400, 5350, 5150, 5100 5000)
+Call res. 0dte 5600 (all 5620 5650 5675 5700 5710, 5750, 5800)
+
+NQm25 (Sdex & VXN à surveiller) Gamma positif
+Max 1D 20535 (en cas d'event 20682, extreme 20825)
+Min 1D 19377 (en cas d'event 19229, extreme 19086)
+Prise de contrôle acheteurs 20083
+Prise de contrôle vendeurs 19743
+Call res. 0dte 19700, 19800 (all 19840 20000, 20050, 20175, 20250, 20400, 20500)
+Put sup 0dte 19600, 19500, 19400 19300 (all 19200, 19100, 19000)
+
+RTY m25 (rvx à surveiller + IWM) Gamma négatif léger 
+Max 1D 2011 (en cas event 2021, extreme 2030)
+Min 1D 1936 (en cas d'event 1946, extreme 1918)
+Acheteurs prise de contrôle 1988
+Vendeurs prise de contrôle 1967
+Put sup. 0dte  1940, 1900, 1850 (put all 1830, 1825, 1820, 1775, 1750)
+Call res. 0dte  1950  1975, 2000
+
+CLm25  Géopo  & OVX à Surveiller gamma négatif
+Max 1D 60.84 (event 61.50)
+Min 1D 55.42 (event 54.78)
+Acheteurs prise de contrôle 58.90
+Vendeurs prise de contrôle 57.40
+Put sup.  59.00, 58.30, 58.00, 57.80, 56.30, 56.00 ( hedgies 55.00)
+Call res.   59.30, 60.00, 60.30, 62.50 63.00 63.50 
+
+GCm25 (surveillez GVZ) gamma positif
+Max 1D  3322 (en cas d'event 3344)
+Min 1D  3151 (en cas d'event 3129)
+Acheteurs prise de contrôle 3262
+Vendeurs prise de contrôle 3211
+Put sup. 3300 3250 3225 3200 3190 (all 3150 3125)
+Call res.   3350 (all 3400, 3425 3450  3500 3525)
+
+6e
+Max 1D 1.1434
+Min 1D 1.1234
+Prise de contrôle acheteurs 1.1392
+Prise de contrôle vendeurs 1.1336
+Put sup 1.1150, 1.11, 1.1050, 1.0950,1.1000, 1.1050, 1.1100, 1.12, 1.1250,
+Call res  1.1450, 1.1500, 1.1550, 1.16, 1.1625, 1.1650, 1.17, 1.1750
+6j
+Max 1D 0.007051 (event 0.007068)
+Min 1D 0.006915 (event 0.006898)
+Prise de contrôle acheteurs 0.007005
+Prise de contrôle vendeurs 0.006963
+Put sup 0.007125 0.007075 0.007050 0.006900 0.006800
+Call res  0.007175, 0.007200, 0.007250, 0.007300
+6N
+Max 1D 0.5999
+Min 1D 0.5898
+Prise de contrôle acheteurs 0.5957
+Prise de contrôle vendeurs 0.5930
+Put sup 0.6000, 0.5950, 0.5900
+Call res  0.6075, 0.6100
+6S
+Max 1D 1.2223
+Min 1D 1.2075
+Prise de contrôle acheteurs 1.2171
+Prise de contrôle vendeurs 1.2127
+Put sup 1.2200 1.2100 1.1900
+Call res  1.2300 1.2400 1.2500
+6a
+Max 1D 0.6457
+Min 1D 0.6351
+Prise de contrôle acheteurs 0.6427
+Prise de contrôle vendeurs 0.6398
+Put sup 0.6425, 0.6400, 0.6375, 0.6350, 0.6300, 0.6250
+Call res  0.64, 0.6450
+
+VIX (IV< hier) gamma positif 
+Max 1D 32.77 (event 34.75)
+Min 1D  16.81
+Acheteurs prise de contrôle 26.77
+Vendeurs prise de contrôle 22.07
+Put sup.   24.00 22.00 20.00 19.00
+Call res.     25.00, 30.00, 35.00, 40.00 42.00 43 50.00, 75.00
+
+VXN 
+Max 1D 35.79 (event 37.75)
+Min 1D 19.89
+Acheteurs prise de contrôle 30.12
+Vendeurs prise de contrôle 25.51
+Put sup. 20.00, 19.00 (all 18.00, 16.00)
+Call res.   40.00, 45.00, 50.00, 55.00, 60.00
+RVX
+Max 1D 34.10 (event 35.52)
+Min 1D 22.70 
+Acheteurs prise de contrôle 30.13
+Vendeurs prise de contrôle 26.79
+Put sup. 21.00, 20.00, 15.00
+Call res.   40.00, 45.00, 50.00, 60.00
+
+OVX (CL volatility)
+Max 1D 66.47
+Min 1D 42.36
+Acheteurs prise de contrôle 59.01
+Vendeurs prise de contrôle 52.05
+Put sup. 28.00,25.00, 20.00
+Call res.  33.00 (all 34.00, 40, 42.00, 50.00, 60.00, 70.00)
+
+GVZ (gold volatility)
+Max 1D 23.70
+Min 1D 19.32
+Acheteurs prise de contrôle 22.51
+Vendeurs prise de contrôle 21.23
+Put sup. 14.00, 13.00,12.00
+Call res.   16.00, 20.00, 25.00, 30.00, 34.00

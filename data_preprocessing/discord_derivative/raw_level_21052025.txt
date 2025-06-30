@@ -1,0 +1,83 @@
+ESm25 (vix To Monitor)  Positive Gamma 
+Max 1D 6029 (event 6051, extreme 6072)
+Min 1D 5855 (event 5833, extreme 5812) 
+Buyers Control 5977
+Sellers Control 5928
+Put sup. 0dte  5900, 5850, 5800, 5750, 5700 5680, 5600, 5500 (all 5575, 5500)
+Call res. 0dte 5975 6000 (all 6020 6050)
+
+NQm25 (Sdex & VXN To Monitor) Positive Gamma
+Max 1D 21769 (event 21862, extreme 21960)
+Min 1D 20988 (event 20889, extreme 20793)
+Buyers Control 21522
+Sellers Control 21304
+Call res. 0dte 21400, 21450 21550  (all 21600 21750 21800 22000)
+Put sup 0dte 21440, 21350 21300, 21250, 21100, 21000, (all 20850)
+
+RTY m25 (rvx To Monitor + IWM) Positive Gamma
+Max 1D 2130 (event 2136, extreme 2143)
+Min 1D 2077 (event 2071, extreme 2065)
+Buyers Control 2114
+Sellers Control 2099
+Put sup. 0dte   2100 (put all 2090 2060, 2050)
+Call res. 0dte  2110, 2120, 2125 2140  2150 2160
+
+YMm25 Positive Gamma 
+Max 1D  43281 (event 43432, extreme 43592)
+Min 1D 42036 (event 41876, extreme 41725)
+Buyers Control 42916
+Sellers Control 42574
+Put sup 0dte 42600, 42400 42300 42000 41600, 41500, 41400 (all  41200 41000 40800)
+Call res 0dte 42750, 43000, 43250 (all 43700)
+
+6e
+Max 1D 1.1442
+Min 1D 1.1252
+Buyers Control 1.1347
+Sellers Control 1.1292
+Put sup 1.1150, 1.11, 1.1050, 1.0950,1.1000, 1.1050, 1.1100, 1.12, 1.1250,
+Call res  1.1450, 1.1500, 1.1550, 1.16, 1.1625, 1.1650, 1.17, 1.1750
+6j
+Max 1D 0.007027 (event 0.007040)
+Min 1D 0.006926 (event 0.006913)
+Buyers Control 0.006995
+Sellers Control 0.006966
+Put sup 0.007125 0.007075 0.007050 0.006900 0.006800
+Call res  0.007175, 0.007200, 0.007250, 0.007300
+6N
+Max 1D 0.5998
+Min 1D 0.5911
+Buyers Control 0.5972
+Sellers Control 0.5946
+Put sup 0.6000, 0.5950, 0.5900
+Call res  0.6075, 0.6100
+6S
+Max 1D 1.2388
+Min 1D 1.2007
+Buyers Control 1.2207
+Sellers Control 1.2098
+Put sup 1.2200 1.2100 1.1900, 1.1800, 1.1700
+Call res  1.2300 1.2400 1.2500
+6a
+Max 1D 0.6505
+Min 1D 0.6400
+Buyers Control 0.6469
+Sellers Control 0.6439
+Put sup 0.6425, 0.6400, 0.6375, 0.6350, 0.6300, 0.6250
+Call res  0.64, 0.6450
+
+usdjpy fx spot 
+Max 1D 144.76
+Min 1D 142.70
+Buyers Control 143.99
+Sellers Control 143.38
+Put sup 145.00 144.00 143.00
+Call res  147.00, 148.00, 149.00, 150.00, 151.00, 152.00
+
+GCm25 (GVZ To Monitor) Positive Gamma
+Max 1D  3337 (event 3344)
+Min 1D  3277 (event 3270)
+Buyers Control 3314
+Sellers Control 3297
+Put sup. 3215  3200 3180 3175 (all 3150 3125 3100 3050 3000)
+Call res.   3235 3245 , 3275 3300 (all 3330 3350 3400)

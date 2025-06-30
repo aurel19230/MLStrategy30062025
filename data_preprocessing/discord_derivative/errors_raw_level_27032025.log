@@ -1,0 +1,3 @@
+Erreurs détectées lors de l'analyse du fichier C:\Users\aulac\OneDrive\Documents\Trading\PyCharmProject\MLStrategy\data_preprocessing\discord_derivative\raw_level_27032025.txt:
+
+- Date 17/04/2025, Ticker CLk25: Éléments manquants: Max_1D_event, Min_1D_event
