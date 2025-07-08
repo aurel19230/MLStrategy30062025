@@ -1,3 +1,7 @@
+from sys import platform
+
+from path import Path
+
 from func_standard import convert_to_unix_timestamp, convert_from_unix_timestamp, timestamp_to_date_utc, \
     date_to_timestamp_utc, print_notification
 import os
@@ -11,10 +15,20 @@ index_SessionStartEnd=5
 index_deltaTimestampOpening=3
 index_indexTrade_result = 6
 
+PATH_PROJECT="C:/Users/aurelienlachaud/OneDrive/Documents/Trading/VisualStudioProject/Sierra_chart/xTickReversal/simu/"
+DIR = "5_0_5TP_6SL"
 
-# Répertoires
-directory = (
-    "C:/Users/aulac/OneDrive/Documents/Trading/VisualStudioProject/Sierra_chart/xTickReversal/simu/5_0_5TP_6SL/")
+
+import platform as platform_module
+
+# ────────────────────────────────────────────────────────────────────────────────
+# Construction du chemin de base selon l'OS
+# ────────────────────────────────────────────────────────────────────────────────
+if platform_module.system() != "Darwin":
+    directory = Path(
+        rf"{PATH_PROJECT}{DIR}/")
+
+
 @njit(parallel=True)
 def apply_20_10_logic_numba(data):
     for i in prange(index_SessionStartEnd, len(data)):

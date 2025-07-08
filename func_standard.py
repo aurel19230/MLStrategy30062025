@@ -407,8 +407,9 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from sklearn.calibration import calibration_curve
 from sklearn.metrics import brier_score_loss
+nom_ordinateur = platform.node()
 
-if platform.system() != "Darwin":  # "Darwin" est le nom interne de macOS
+if platform.system() != "Darwin" and nom_ordinateur!="AURLIENLACHB5A1": # "Darwin" est le nom interne de macOS
     import cupy as cp
 else:
     print("CuPy ne sera pas importé sur macOS.")

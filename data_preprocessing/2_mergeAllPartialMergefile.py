@@ -19,17 +19,30 @@ import numpy as np
 import pandas as pd
 
 # ───────────────────────── Paramétrage dossier ───────────────────────────────
-directory = (
-    r"C:\Users\aulac\OneDrive\Documents\Trading\VisualStudioProject"
-    r"\Sierra_chart\xTickReversal\simu\5_0_5TP_6SL\merge"
-)
+PATH_PROJECT="C:/Users/aurelienlachaud/OneDrive/Documents/Trading/VisualStudioProject/Sierra_chart/xTickReversal/simu/"
+DIR = "5_0_5TP_6SL"
 
-# Extraire le nom de config (répertoire parent de « merge »)
-path_components   = directory.split(os.sep)
-merge_index       = path_components.index("merge")
-xtickRev_config_dir = path_components[merge_index - 1]
 
-print(f"Configuration détectée : {xtickRev_config_dir}")
+import platform as platform_module
+from pathlib import Path  # ✅ pathlib au lieu de path
+import os
+
+# Construction du chemin
+if platform_module.system() != "Darwin":
+    directory = Path(rf"{PATH_PROJECT}{DIR}/merge")
+
+print(directory)
+
+# ✅ Utiliser pathlib.parts au lieu de split
+path_components = directory.parts
+print(f"Path components: {path_components}")
+
+if "merge" in path_components:
+    merge_index = path_components.index("merge")
+    xtickRev_config_dir = path_components[merge_index - 1]
+    print(f"Config directory: {xtickRev_config_dir}")
+else:
+    print("'merge' not found in path components")
 
 # ─────────────────────────── Choice de l’utilisateur ─────────────────────────
 option = input(

@@ -5,9 +5,18 @@ import os
 import time
 from func_standard import  print_notification
 
-directory = r"C:\Users\aulac\OneDrive\Documents\Trading\VisualStudioProject\Sierra_chart\xTickReversal\simu\5_0_5TP_6SL\merge"
+import platform as platform_module
+from path import Path
 
-file="Step2_5_0_5TP_6SL_150525_300625.csv"
+# ────────────────────────────────────────────────────────────────────────────────
+# Construction du chemin de base selon l'OS
+# ────────────────────────────────────────────────────────────────────────────────
+PATH_PROJECT="C:/Users/aurelienlachaud/OneDrive/Documents/Trading/VisualStudioProject/Sierra_chart/xTickReversal/simu/"
+DIR = "5_0_5TP_6SL"
+if platform_module.system() != "Darwin":
+    directory = Path(
+        rf"{PATH_PROJECT}{DIR}/merge")
+file="Step2_5_0_5TP_6SL_010124_010725.csv"
 
 file_path = os.path.join(directory, file)
 

@@ -24,15 +24,20 @@ DIR = "5_0_5TP_6SL"
 # ────────────────────────────────────────────────────────────────────────────────
 if platform.system() != "Darwin":
     DIRECTORY_PATH = Path(
-        rf"C:\Users\aulac\OneDrive\Documents\Trading\VisualStudioProject\Sierra_chart\xTickReversal\simu\{DIR}\merge")
+        rf"C:\Users\aurelienlachaud\OneDrive\Documents\Trading\VisualStudioProject\Sierra_chart\xTickReversal\simu\{DIR}\merge"
+    )
 else:
     DIRECTORY_PATH = Path(f"/Users/aurelienlachaud/Documents/trading_local/{DIR}/merge")
 
 # ────────────────────────────────────────────────────────────────────────────────
 # Base des noms de fichiers
 # ────────────────────────────────────────────────────────────────────────────────
-BASE = "Step5_5_0_5TP_6SL_150525_300625_extractOnlyFullSession_Only"
-SPLIT_SUFFIX = "_feat"
+BASE = "Step5_5_0_5TP_6SL_010124_010725_extractOnlyFullSession_Only"
+SPLIT_SUFFIX_TRAIN = "_feat__split1_01012024_01052024"
+SPLIT_SUFFIX_TEST = "_feat__split2_01052024_30092024"
+SPLIT_SUFFIX_VAL1 = "_feat__split3_30092024_27022025"
+SPLIT_SUFFIX_VAL = "_feat__split4_27022025_14052025"
+SPLIT_SUFFIX_UNSEEN = "_feat__split5_14052025_30062025"
 DIRECTION = "Short"
 
 # ────────────────────────────────────────────────────────────────────────────────
@@ -40,11 +45,11 @@ DIRECTION = "Short"
 # ────────────────────────────────────────────────────────────────────────────────
 FILE_NAME = lambda split: f"{BASE}{DIRECTION}{split}.csv"
 
-FILE_PATH_TRAIN  = DIRECTORY_PATH / FILE_NAME(SPLIT_SUFFIX)
-FILE_PATH_TEST   = DIRECTORY_PATH / FILE_NAME(SPLIT_SUFFIX)
-FILE_PATH_VAL1   = DIRECTORY_PATH / FILE_NAME(SPLIT_SUFFIX)
-FILE_PATH_VAL    = DIRECTORY_PATH / FILE_NAME(SPLIT_SUFFIX)
-FILE_PATH_UNSEEN = DIRECTORY_PATH / FILE_NAME(SPLIT_SUFFIX)
+FILE_PATH_TRAIN  = DIRECTORY_PATH / FILE_NAME(SPLIT_SUFFIX_TRAIN)
+FILE_PATH_TEST   = DIRECTORY_PATH / FILE_NAME(SPLIT_SUFFIX_TEST)
+FILE_PATH_VAL1   = DIRECTORY_PATH / FILE_NAME(SPLIT_SUFFIX_VAL1)
+FILE_PATH_VAL    = DIRECTORY_PATH / FILE_NAME(SPLIT_SUFFIX_VAL)
+FILE_PATH_UNSEEN = DIRECTORY_PATH / FILE_NAME(SPLIT_SUFFIX_UNSEEN)
 
 
 # ────────────────────────────────────────────────────────────────────────────────

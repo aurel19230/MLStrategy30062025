@@ -8,13 +8,15 @@ import os
 # ═════════════════════════════════════════════════════════════════════════════
 # 1) PARAMÈTRES & CHARGEMENT
 # ═════════════════════════════════════════════════════════════════════════════
-file_name      = "Step3_5_0_5TP_6SL_150525_300625_extractOnlyFullSession.csv"
-directory_path = (r"C:\Users\aulac\OneDrive\Documents\Trading\VisualStudioProject"
-                  r"\Sierra_chart\xTickReversal\simu\5_0_5TP_6SL\\merge")
+import platform as platform_module
+from path import Path
+file_name="Step3_5_0_5TP_6SL_010124_010725_extractOnlyFullSession.csv"
 
-# file_name      = "Step3_version2_170924_100325_bugFixTradeResult1_extractOnlyFullSession.csv"
-# directory_path = (r"C:\Users\aulac\OneDrive\Documents\Trading\VisualStudioProject"
-#                   r"\Sierra chart\xTickReversal\simu\5_0_5TP_1SL\version2\merge")
+PATH_PROJECT="C:/Users/aurelienlachaud/OneDrive/Documents/Trading/VisualStudioProject/Sierra_chart/xTickReversal/simu/"
+DIR = "5_0_5TP_6SL"
+if platform_module.system() != "Darwin":
+    directory_path = Path(
+        rf"{PATH_PROJECT}{DIR}/merge")
 file_path      = os.path.join(directory_path, file_name)
 
 user_choice = input("Entrée = shorts+longs, 's' = shorts only, 'l' = longs only : ").strip().lower()

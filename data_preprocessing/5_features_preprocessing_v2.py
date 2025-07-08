@@ -21,8 +21,8 @@ from pandas.errors import PerformanceWarning
 # Ignorer tous les avertissements de performance pandas
 warnings.filterwarnings("ignore", category=PerformanceWarning)
 direction="Short"
-file_name =        f"Step4_5_0_5TP_6SL_150525_300625_extractOnlyFullSession_Only{direction}.csv"
-file_name_unseen = f"Step5_5_0_5TP_6SL_010124_270625_extractOnlyFullSession_Only{direction}_feat__split5_15052025_27062025.csv"
+file_name =        f"Step4_5_0_5TP_6SL_010124_010725_extractOnlyFullSession_OnlyShort{direction}.csv"
+file_name_unseen = f"Step5_5_0_5TP_6SL_010124_270625_extractOnlyFullSession_Only{direction}_feat__split5_15052025_30062025.csv"
 DIR="5_0_5TP_6SL"
 
 file_nameEvent = "Calendrier_Evenements_Macroeconomiques_2024_2025_AvecDoubleEvent.csv"
@@ -30,19 +30,51 @@ file_nameEvent = "Calendrier_Evenements_Macroeconomiques_2024_2025_AvecDoubleEve
 USSE_SPLIT_SESSION=True #pour effectuer les split des sessions
 USE_DEFAUT_PARAM_4_SPLIT_SESSION = True #pour prendre les semarquations des splits par defaut
 
+import platform as platform_module
+from path import Path
+file_name="Step4_5_0_5TP_6SL_010124_010725_extractOnlyFullSession_OnlyShort.csv"
 
-# Chemin du répertoire
-#directory_path =  r"C:\Users\aulac\OneDrive\Documents\Trading\VisualStudioProject\Sierra_chart\xTickReversal\simu\5_0_5TP_1SL\version2\merge\extend"
-if platform.system() != "Darwin":
-    directory_path = rf"C:\Users\aulac\OneDrive\Documents\Trading\VisualStudioProject\Sierra_chart\xTickReversal\simu\{DIR}\merge"
-    directory_path = rf"C:\Users\aulac\OneDrive\Documents\Trading\VisualStudioProject\Sierra_chart\xTickReversal\simu\\{DIR}\\merge"
-    directory_path_unseen = rf"C:\Users\aulac\OneDrive\Documents\Trading\VisualStudioProject\Sierra_chart\xTickReversal\simu\{DIR}\merge"
-    directory_path_unseen=rf"C:\Users\aulac\OneDrive\Documents\Trading\VisualStudioProject\Sierra_chart\xTickReversal\simu\{DIR}\merge"
-    directory_pathEvent = r"C:\Users\aulac\OneDrive\Documents\Trading\VisualStudioProject\Sierra_chart\xTickReversal\simu\5_0_5TP_6SL_Train_Test_Val1_Val\merge"
-else:
-    directory_path = "/Users/aurelienlachaud/Documents/trading_local/5_0_5TP_1SL_1/merge"
-# Construction du chemin complet du fichier
-file_path = os.path.join(directory_path, file_name)
+PATH_PROJECT="C:/Users/aurelienlachaud/OneDrive/Documents/Trading/VisualStudioProject/Sierra_chart/xTickReversal/simu/"
+DIR = "5_0_5TP_6SL"
+from pathlib import Path
+import platform as platform_module   # ← alias explicite
+
+# ---------------------------------------------------------------------------
+# Variables externes supposées déjà définies :
+#   • PATH_PROJECT  (racine de ton projet Windows)
+#   • DIR           (ex. "5_0_5TP_6SL")
+#   • file_name     (nom du fichier final – p.ex. "Step4_…csv")
+# ---------------------------------------------------------------------------
+
+if platform_module.system() != "Darwin":            # Windows / Linux
+    # Racine commune côté OneDrive
+    BASE_SIMU_DIR = Path(r"C:/Users/aurelienlachaud/OneDrive/Documents/Trading/"
+                         r"VisualStudioProject/Sierra_chart/xTickReversal/simu")
+
+    directory_path       = Path(f"{PATH_PROJECT}{DIR}/merge")        # ancien chemin « principal »
+    directory_path_unseen = BASE_SIMU_DIR / DIR / "merge"            # unseen
+    directory_pathEvent   = BASE_SIMU_DIR / "5_0_5TP_6SL_Train_Test_Val1_Val" / "merge"
+    AUTOGEN_INCLUDE = Path(
+        r"C:\Users\aurelienlachaud\dev\trading\visualStudio"
+        r"\scierra_chart\xTicksReversal\xTickReversal30062025\include"
+    )
+
+else:                                             # macOS
+    BASE_SIMU_DIR = Path("/Users/aurelienlachaud/Documents/trading_local")
+
+    directory_path       = BASE_SIMU_DIR / DIR / "merge"
+    AUTOGEN_INCLUDE = Path(
+        "/Users/aurelienlachaud/Documents/trading_local/xTickReversal/include"
+    )
+    # Sur macOS tu n’utilises peut-être pas d’équivalent « unseen »/« event » ;
+    # si besoin, décommente et adapte :
+    # directory_path_unseen = BASE_SIMU_DIR / DIR / "merge"
+    # directory_pathEvent   = BASE_SIMU_DIR / "5_0_5TP_6SL_Train_Test_Val" / "merge"
+
+# ---------------------------------------------------------------------------
+# Construction finale du chemin du fichier CSV (ou autre)
+# ---------------------------------------------------------------------------
+file_path = directory_path / file_name
 file_path_unseen = os.path.join(directory_path_unseen, file_name_unseen)
 
 file_pathEvent = os.path.join(directory_pathEvent, file_nameEvent)
@@ -939,9 +971,9 @@ def calculate_features_and_sessionsStat(df, file_path_, trained_models=None):
             "short_condition": 0  # V<D<
         },
         "micro_antiepuisement": {
-            "long_period": 6,
-            "long_vol_threshold": -4.820,
-            "long_dur_threshold": 2.350,
+            "long_period": 7,
+            "long_vol_threshold": -4.820,#-4.820,
+            "long_dur_threshold": 2.350,#2.350,
             "long_condition": 3  # V>D>
         }
 
@@ -949,13 +981,12 @@ def calculate_features_and_sessionsStat(df, file_path_, trained_models=None):
 
     generate_trading_config_header(
         params=PARAMS,
-        output_path=r"C:\Users\aulac\OneDrive\Documents\Trading\VisualStudioProject\Sierra_chart\xTickReversal\include\Special_indicator_autoGenPy.h"
+        output_path=AUTOGEN_INCLUDE / "Special_indicator_autoGenPy.h"
     )
 
-    # 2. Optionnel : Génération du chargeur CSV
     generate_csv_loader_header(
-        csv_path=r"C:\Users\aulac\OneDrive\Documents\Trading\VisualStudioProject\Sierra_chart\xTickReversal\include\Special_indicator_config.csv",
-        output_h_path=r"C:\Users\aulac\OneDrive\Documents\Trading\VisualStudioProject\Sierra_chart\xTickReversal\include\Special_indicator_loader_header_autoGenPy.h"
+        csv_path=AUTOGEN_INCLUDE / "Special_indicator_config.csv",
+        output_h_path=AUTOGEN_INCLUDE / "Special_indicator_loader_header_autoGenPy.h"
     )
 
     print("\n🎯 RÉSUMÉ :")

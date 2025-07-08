@@ -3,8 +3,8 @@ import numpy as np
 import platform
 from termcolor import colored
 from colorama import Fore, Style, init
-
-if platform.system() != "Darwin":  # "Darwin" est le nom interne de macOS
+nom_ordinateur = platform.node()
+if platform.system() != "Darwin" and nom_ordinateur!="AURLIENLACHB5A1":  # "Darwin" est le nom interne de macOS
     import cupy as cp
 else:
     print("CuPy ne sera pas importé sur macOS.")
