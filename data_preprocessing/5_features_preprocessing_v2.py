@@ -971,7 +971,7 @@ def calculate_features_and_sessionsStat(df, file_path_, trained_models=None):
             "short_condition": 0  # V<D<
         },
         "micro_antiepuisement": {
-            "long_period": 7,
+            "long_period": 6,
             "long_vol_threshold": -4.820,#-4.820,
             "long_dur_threshold": 2.350,#2.350,
             "long_condition": 3  # V>D>

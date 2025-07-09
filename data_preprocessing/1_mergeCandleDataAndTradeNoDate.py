@@ -14,19 +14,17 @@ from numba import njit, prange
 index_SessionStartEnd=5
 index_deltaTimestampOpening=3
 index_indexTrade_result = 6
-
-PATH_PROJECT="C:/Users/aurelienlachaud/OneDrive/Documents/Trading/VisualStudioProject/Sierra_chart/xTickReversal/simu/"
-DIR = "5_0_5TP_6SL"
-
-
 import platform as platform_module
 
-# ────────────────────────────────────────────────────────────────────────────────
-# Construction du chemin de base selon l'OS
-# ────────────────────────────────────────────────────────────────────────────────
-if platform_module.system() != "Darwin":
-    directory = Path(
-        rf"{PATH_PROJECT}{DIR}/")
+PATH_PROJECT="C:/Users/aurelienlachaud/OneDrive/Documents/Trading/VisualStudioProject/Sierra_chart/xTickReversal/simu/"
+dir_name = "5_0_5TP_6SL"
+
+if platform_module.system() == "Darwin":  # macOS
+    # Chemin vers Parallels Desktop VM Windows
+    directory= Path(f"/Volumes/[C] Windows 11/Users/aurelienlachaud/OneDrive/Documents/Trading/VisualStudioProject/Sierra_chart/xTickReversal/simu/{dir_name}")
+else:  # Windows
+    directory= Path(f"C:/Users/aurelienlachaud/OneDrive/Documents/Trading/VisualStudioProject/Sierra_chart/xTickReversal/simu/{dir_name}")
+
 
 
 @njit(parallel=True)
