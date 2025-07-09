@@ -14,8 +14,7 @@ from Tools.func_features_preprocessing import *
 # CONFIGURATION PRINCIPALE
 # ────────────────────────────────────────────────────────────────────────────────
 
-ENV = detect_environment()
-DIR = "5_0_5TP_6SL"
+
 
 # Configuration pour l'analyse par plage de dates (HEURES OBLIGATOIRES)
 DATE_RANGE_ANALYSIS = {
@@ -28,14 +27,17 @@ DATE_RANGE_ANALYSIS = {
     'end_time': '21:00:00',  # OBLIGATOIRE
     'date_column': 'date'
 }
-
+ENV = detect_environment()
+DIR = "5_0_5TP_6SL"
 # Construction du chemin de base selon l'OS
-if platform.system() != "Darwin":
-    DIRECTORY_PATH = Path(
-        rf"C:\Users\aurelienlachaud\OneDrive\Documents\Trading\VisualStudioProject\Sierra_chart\xTickReversal\simu\{DIR}\merge"
-    )
-else:
-    DIRECTORY_PATH = Path(f"/Users/aurelienlachaud/Documents/trading_local/{DIR}/merge")
+def get_directory_path(dir_name):
+    if platform.system() == "Darwin":  # macOS
+        # Chemin vers Parallels Desktop VM Windows
+        return Path(f"/Volumes/[C] Windows 11/Users/aurelienlachaud/OneDrive/Documents/Trading/VisualStudioProject/Sierra_chart/xTickReversal/simu/{dir_name}/merge")
+    else:  # Windows
+        return Path(f"C:/Users/aurelienlachaud/OneDrive/Documents/Trading/VisualStudioProject/Sierra_chart/xTickReversal/simu/{dir_name}/merge")
+
+DIRECTORY_PATH = get_directory_path(DIR)
 
 # Base des noms de fichiers
 BASE = "Step5_5_0_5TP_6SL_010124_010725_extractOnlyFullSession_Only"
@@ -46,13 +48,18 @@ SPLIT_SUFFIX_VAL = "_feat__split4_27022025_14052025"
 SPLIT_SUFFIX_UNSEEN = "_feat__split5_14052025_30062025"
 DIRECTION = "Short"
 
-# Construction des chemins de fichiers
-FILE_NAME = lambda split: f"{BASE}{DIRECTION}{split}.csv"
-FILE_PATH_TRAIN = DIRECTORY_PATH / FILE_NAME(SPLIT_SUFFIX_TRAIN)
-FILE_PATH_TEST = DIRECTORY_PATH / FILE_NAME(SPLIT_SUFFIX_TEST)
-FILE_PATH_VAL1 = DIRECTORY_PATH / FILE_NAME(SPLIT_SUFFIX_VAL1)
-FILE_PATH_VAL = DIRECTORY_PATH / FILE_NAME(SPLIT_SUFFIX_VAL)
-FILE_PATH_UNSEEN = DIRECTORY_PATH / FILE_NAME(SPLIT_SUFFIX_UNSEEN)
+# Construction des chemins de fichiers avec vérification
+def get_file_path(split_suffix):
+    file_name = f"{BASE}{DIRECTION}{split_suffix}.csv"
+    file_path = DIRECTORY_PATH / file_name
+    return file_path
+
+FILE_PATH_TRAIN = get_file_path(SPLIT_SUFFIX_TRAIN)
+FILE_PATH_TEST = get_file_path(SPLIT_SUFFIX_TEST)
+FILE_PATH_VAL1 = get_file_path(SPLIT_SUFFIX_VAL1)
+FILE_PATH_VAL = get_file_path(SPLIT_SUFFIX_VAL)
+FILE_PATH_UNSEEN = get_file_path(SPLIT_SUFFIX_UNSEEN)
+
 
 GLOBAL_MICRO_FILTER = {
     'sc_volume_perTick': [

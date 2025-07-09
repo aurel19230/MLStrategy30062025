@@ -1,12 +1,10 @@
-
-from func_standard import calculate_naked_poc_distances, CUSTOM_SESSIONS,diviser_fichier_par_sessions, \
-    save_features_with_sessions,process_reg_slope_replacement
+from func_standard import calculate_naked_poc_distances, CUSTOM_SESSIONS, diviser_fichier_par_sessions, \
+    save_features_with_sessions, process_reg_slope_replacement
 
 from Tools.func_features_preprocessing import *
 import numpy as np
 from stats_sc.standard_stat_sc import *
 from Clustering.func_clustering import *
-
 
 import platform  # <-- Ajouter cette ligne
 
@@ -17,59 +15,61 @@ valueY = np.nan
 # Définition de la fonction calculate_max_ratio
 import warnings
 from pandas.errors import PerformanceWarning
+
 # Nom du fichier
 # Ignorer tous les avertissements de performance pandas
 warnings.filterwarnings("ignore", category=PerformanceWarning)
-direction="Short"
-file_name =        f"Step4_5_0_5TP_6SL_010124_010725_extractOnlyFullSession_OnlyShort{direction}.csv"
+direction = "Long"
+file_name = f"Step4_5_0_5TP_6SL_010124_010725_extractOnlyFullSession_Only{direction}.csv"
 file_name_unseen = f"Step5_5_0_5TP_6SL_010124_270625_extractOnlyFullSession_Only{direction}_feat__split5_15052025_30062025.csv"
-DIR="5_0_5TP_6SL"
+DIR = "5_0_5TP_6SL"
 
 file_nameEvent = "Calendrier_Evenements_Macroeconomiques_2024_2025_AvecDoubleEvent.csv"
 
-USSE_SPLIT_SESSION=True #pour effectuer les split des sessions
-USE_DEFAUT_PARAM_4_SPLIT_SESSION = True #pour prendre les semarquations des splits par defaut
+USSE_SPLIT_SESSION = True  # pour effectuer les split des sessions
+USE_DEFAUT_PARAM_4_SPLIT_SESSION = True  # pour prendre les semarquations des splits par defaut
 
 import platform as platform_module
-from path import Path
-file_name="Step4_5_0_5TP_6SL_010124_010725_extractOnlyFullSession_OnlyShort.csv"
-
-PATH_PROJECT="C:/Users/aurelienlachaud/OneDrive/Documents/Trading/VisualStudioProject/Sierra_chart/xTickReversal/simu/"
-DIR = "5_0_5TP_6SL"
 from pathlib import Path
-import platform as platform_module   # ← alias explicite
+
+
+PATH_PROJECT = "C:/Users/aurelienlachaud/OneDrive/Documents/Trading/VisualStudioProject/Sierra_chart/xTickReversal/simu/"
+DIR = "5_0_5TP_6SL"
 
 # ---------------------------------------------------------------------------
-# Variables externes supposées déjà définies :
-#   • PATH_PROJECT  (racine de ton projet Windows)
-#   • DIR           (ex. "5_0_5TP_6SL")
-#   • file_name     (nom du fichier final – p.ex. "Step4_…csv")
+# Configuration des chemins selon l'OS
 # ---------------------------------------------------------------------------
 
-if platform_module.system() != "Darwin":            # Windows / Linux
+if platform_module.system() != "Darwin":  # Windows / Linux
     # Racine commune côté OneDrive
     BASE_SIMU_DIR = Path(r"C:/Users/aurelienlachaud/OneDrive/Documents/Trading/"
                          r"VisualStudioProject/Sierra_chart/xTickReversal/simu")
 
-    directory_path       = Path(f"{PATH_PROJECT}{DIR}/merge")        # ancien chemin « principal »
-    directory_path_unseen = BASE_SIMU_DIR / DIR / "merge"            # unseen
-    directory_pathEvent   = BASE_SIMU_DIR / "5_0_5TP_6SL_Train_Test_Val1_Val" / "merge"
+    BASE_INCLUDE_DIR = Path(r"C:/Users/aurelienlachaud/OneDrive/Documents/Trading/"
+                            r"VisualStudioProject/Sierra_chart/xTickReversal/include")
+
+    directory_path = Path(f"{PATH_PROJECT}{DIR}/merge")  # ancien chemin « principal »
+    directory_path_unseen = BASE_SIMU_DIR / DIR / "merge"  # unseen
+    directory_pathEvent = BASE_SIMU_DIR / "5_0_5TP_6SL_Train_Test_Val1_Val" / "merge"
+
     AUTOGEN_INCLUDE = Path(
         r"C:\Users\aurelienlachaud\dev\trading\visualStudio"
         r"\scierra_chart\xTicksReversal\xTickReversal30062025\include"
     )
 
-else:                                             # macOS
-    BASE_SIMU_DIR = Path("/Users/aurelienlachaud/Documents/trading_local")
+else:  # macOS - Parallels
+    # Chemin vers Parallels VM Windows OneDrive
+    BASE_PARALLELS_PATH = Path(
+        "/Volumes/[C] Windows 11/Users/aurelienlachaud/OneDrive/Documents/Trading/VisualStudioProject/Sierra_chart/xTickReversal")
 
-    directory_path       = BASE_SIMU_DIR / DIR / "merge"
-    AUTOGEN_INCLUDE = Path(
-        "/Users/aurelienlachaud/Documents/trading_local/xTickReversal/include"
-    )
-    # Sur macOS tu n’utilises peut-être pas d’équivalent « unseen »/« event » ;
-    # si besoin, décommente et adapte :
-    # directory_path_unseen = BASE_SIMU_DIR / DIR / "merge"
-    # directory_pathEvent   = BASE_SIMU_DIR / "5_0_5TP_6SL_Train_Test_Val" / "merge"
+    BASE_SIMU_DIR = BASE_PARALLELS_PATH / "simu"
+    BASE_INCLUDE_DIR = BASE_PARALLELS_PATH / "include"
+
+    directory_path = BASE_SIMU_DIR / DIR / "merge"
+    directory_path_unseen = BASE_SIMU_DIR / DIR / "merge"  # unseen
+    directory_pathEvent = BASE_SIMU_DIR / "5_0_5TP_6SL_Train_Test_Val1_Val" / "merge"
+
+    AUTOGEN_INCLUDE = BASE_INCLUDE_DIR
 
 # ---------------------------------------------------------------------------
 # Construction finale du chemin du fichier CSV (ou autre)
